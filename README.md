@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# taraqqiyot-afficial
 
-## Getting Started
+Taraqqiyot Teaching Center (Namangan) sayti: bosh sahifa, kurslar bo'yicha ariza sahifalari va
+arizalarni Telegram guruhiga yuborish. Next.js 16.
 
-First, run the development server:
+## Kompyuterda ishga tushirish
 
 ```bash
+npm install
+cp .env.example .env.local   # TELEGRAM_BOT_TOKEN va TELEGRAM_CHAT_ID ni to'ldiring
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Serverga joylash (Docker)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+git clone https://github.com/Rahmadjon0038/taraqqiyot-afficial.git
+cd taraqqiyot-afficial
+./deploy.sh        # birinchi marta .env yaratadi — to'ldiring va qayta ishga tushiring
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env` ichida: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SITE_URL` (masalan `https://domen.uz`),
+`HOST_PORT` (standart 3800), `BIND_ADDRESS` (standart 127.0.0.1 — nginx orqali).
 
-## Learn More
+| Buyruq | Vazifasi |
+|---|---|
+| `./deploy.sh` | yangi kodni oladi, qayta yig'adi, ishga tushiradi |
+| `./deploy.sh logs` | jurnal |
+| `./deploy.sh status` | holat |
+| `./deploy.sh restart` | qayta ishga tushirish |
+| `./deploy.sh stop` | to'xtatish |
 
-To learn more about Next.js, take a look at the following resources:
+Token faqat serverdagi `.env` faylida turadi: git'ga ham, Docker image'ga ham, brauzerga ham chiqmaydi.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Ma'lumotlarni o'zgartirish
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Kurslar, filiallar, sertifikatlar va Instagram videolar ro'yxati — `lib/data.js`.

@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  // Docker uchun: .next/standalone ichida o'zi ishlaydigan kichik server yig'iladi.
+  output: "standalone",
 };
 
 export default nextConfig;
