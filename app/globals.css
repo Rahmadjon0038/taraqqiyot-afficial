@@ -22,7 +22,7 @@ html, body {
 
 body {
 	/* The font variables are set on <body> by next/font, so derive these here. */
-	--display: var(--font-display), Impact, "Arial Narrow", sans-serif;
+	--display: var(--font-display-cyr), var(--font-display), Impact, "Arial Narrow", sans-serif;
 	--mono: var(--font-mono), ui-monospace, Menlo, monospace;
 	--hand: var(--font-hand), "Comic Sans MS", cursive;
 	display: flex;
@@ -128,13 +128,13 @@ body {
 	flex: none;
 	align-items: center;
 	justify-content: center;
-	width: 60px;
+	width: 80px;
 	border-right: var(--line);
 }
 
 .home-nav-brand img {
-	width: 38px;
-	height: 38px;
+	width: 62px;
+	height: 46px;
 	object-fit: contain;
 	transition: transform 0.2s;
 }
@@ -179,6 +179,36 @@ body {
 
 .home-nav-links a:hover::after {
 	transform: scaleX(1);
+}
+
+.lang-switch {
+	display: flex;
+	flex: none;
+	align-items: center;
+	gap: 4px;
+	padding: 0 12px;
+}
+
+.lang-switch a {
+	padding: 6px 7px;
+	border: 1.5px solid transparent;
+	color: var(--ink);
+	font-family: var(--mono);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	line-height: 1;
+	text-decoration: none;
+}
+
+.lang-switch a:hover {
+	border-color: var(--ink);
+}
+
+.lang-switch a.is-active {
+	border-color: var(--red);
+	background: var(--red);
+	color: var(--card);
 }
 
 .home-nav-cta {
@@ -1122,11 +1152,30 @@ body {
 }
 
 .site-header {
+	position: relative;
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: center;
 	gap: 12px;
 	padding: 24px 20px 0;
+}
+
+.site-brand {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	color: var(--ink);
+	text-decoration: none;
+}
+
+.lang-switch-page {
+	position: absolute;
+	top: 24px;
+	right: 20px;
+	padding: 4px;
+	border: var(--line);
+	background: var(--card);
 }
 
 .site-logo {
@@ -1570,12 +1619,12 @@ body {
 	}
 
 	.home-nav-brand {
-		width: 48px;
+		width: 58px;
 	}
 
 	.home-nav-brand img {
-		width: 32px;
-		height: 32px;
+		width: 46px;
+		height: 36px;
 	}
 
 	.home-nav-links {
@@ -1601,8 +1650,24 @@ body {
 	}
 
 	.home-nav-cta span,
-	.home-nav-links .home-nav-wide {
+	.home-nav-links .home-nav-wide,
+	.home-nav-links .home-nav-mid {
 		display: none;
+	}
+
+	.home-nav .lang-switch {
+		gap: 2px;
+		padding: 0 6px;
+	}
+
+	.home-nav .lang-switch a {
+		padding: 5px 4px;
+		font-size: 11px;
+	}
+
+	.lang-switch-page {
+		position: static;
+		flex-basis: auto;
 	}
 
 	.home-videos {
@@ -1863,4 +1928,86 @@ body {
 	.home-marquee-track {
 		animation: none;
 	}
+}
+
+/* Legal pages */
+
+.legal {
+	width: min(100% - 36px, 760px);
+	margin: 30px auto 0;
+	padding: 34px 30px 36px;
+	border: var(--line);
+	background: var(--card);
+	box-shadow: 7px 7px 0 var(--red);
+	line-height: 1.65;
+}
+
+.legal h1 {
+	margin: 0;
+	font-family: var(--display);
+	font-size: clamp(36px, 7vw, 56px);
+	font-weight: 400;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.legal-updated {
+	margin: 10px 0 24px;
+	color: var(--muted);
+	font-family: var(--mono);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.legal h2 {
+	margin: 30px 0 8px;
+	color: var(--red);
+	font-size: 20px;
+	font-weight: 800;
+}
+
+.legal p,
+.legal li {
+	font-size: 16px;
+}
+
+.legal ul {
+	margin: 8px 0;
+	padding-left: 22px;
+}
+
+.legal a {
+	color: var(--red);
+	font-weight: 700;
+}
+
+.legal .results-button {
+	color: var(--card);
+}
+
+.site-footer-legal {
+	margin-top: 12px;
+	font-family: var(--mono);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.site-footer-legal a {
+	color: var(--muted);
+}
+
+.privacy-consent {
+	margin: 0;
+	color: var(--muted);
+	font-size: 12px;
+	line-height: 1.5;
+	text-align: center;
+}
+
+.privacy-consent a {
+	color: var(--red);
 }

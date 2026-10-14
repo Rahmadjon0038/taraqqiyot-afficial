@@ -23,6 +23,7 @@ export async function POST(request) {
   const branch = branches.includes(body.branch) ? body.branch : null;
   const course = courses.includes(body.course) ? body.course : null;
   const otherCity = body.otherCity === true;
+  const language = { ru: "Ruscha", en: "Inglizcha" }[body.lang];
 
   if (!name || !/^998\d{9}$/.test(phone)) {
     return Response.json({ ok: false, error: "invalid" }, { status: 400 });
@@ -35,6 +36,7 @@ export async function POST(request) {
   } else if (branch) {
     lines.push(`📍 Filial: ${branchNames[branch]}`);
   }
+  if (language) lines.push(`🌐 Sayt tili: ${language}`);
   lines.push(
     `🕒 ${new Date().toLocaleString("ru-RU", { timeZone: "Asia/Tashkent" })}`
   );

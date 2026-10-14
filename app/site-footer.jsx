@@ -1,6 +1,8 @@
+import { getDictionary, localePath } from "@/lib/i18n";
+
 const socials = [
   {
-    name: "Telegram kanal",
+    key: "telegram",
     handle: "@taraqqiyot_namangan_rasmiy",
     href: "https://t.me/taraqqiyot_namangan_rasmiy",
     icon: (
@@ -10,7 +12,7 @@ const socials = [
     ),
   },
   {
-    name: "Instagram",
+    key: "instagram",
     handle: "@taraqqiyot_namangan",
     href: "https://www.instagram.com/taraqqiyot_namangan",
     icon: (
@@ -23,19 +25,21 @@ const socials = [
   },
 ];
 
-export default function SiteFooter() {
+export default function SiteFooter({ lang }) {
+  const t = getDictionary(lang);
+
   return (
     <footer className="site-footer" id="aloqa">
-      <h2>Bizni kuzatib boring</h2>
+      <h2>{t.footer.follow}</h2>
 
       <div className="site-footer-links">
         {socials.map((social) => (
-          <a key={social.name} href={social.href} target="_blank" rel="noopener noreferrer">
+          <a key={social.key} href={social.href} target="_blank" rel="noopener noreferrer">
             <span className="site-footer-icon" aria-hidden="true">
               {social.icon}
             </span>
             <span className="site-footer-text">
-              <strong>{social.name}</strong>
+              <strong>{social.key === "telegram" ? t.footer.telegram : "Instagram"}</strong>
               <small>{social.handle}</small>
             </span>
           </a>
@@ -43,6 +47,9 @@ export default function SiteFooter() {
       </div>
 
       <p>© Taraqqiyot Teaching Center</p>
+      <p className="site-footer-legal">
+        <a href={localePath(lang, "/privacy-policy")}>{t.footer.privacy}</a>
+      </p>
     </footer>
   );
 }

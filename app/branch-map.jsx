@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { branchInfo, branchNames } from "@/lib/data";
+import { branchInfo } from "@/lib/data";
+import { getDictionary } from "@/lib/i18n";
 
 const order = ["boburshox", "chorsu", "davlatobod"];
 
-export default function BranchMap() {
+export default function BranchMap({ lang }) {
+  const t = getDictionary(lang);
   const [active, setActive] = useState(order[0]);
   const info = branchInfo[active];
+  const landmark = t.landmarks[active];
 
   return (
     <div className="branch-map">
@@ -22,24 +25,24 @@ export default function BranchMap() {
               className={branch === active ? "branch-tab is-active" : "branch-tab"}
               onClick={() => setActive(branch)}
             >
-              <strong>{branchNames[branch]}</strong>
+              <strong>{t.branchNames[branch]}</strong>
             </button>
           ))}
         </div>
 
         <dl className="branch-details">
-          {info.landmark && (
+          {landmark && (
             <div>
-              <dt>Mo'ljal</dt>
-              <dd>{info.landmark}</dd>
+              <dt>{t.branches.landmark}</dt>
+              <dd>{landmark}</dd>
             </div>
           )}
           <div>
-            <dt>Ish vaqti</dt>
+            <dt>{t.branches.hours}</dt>
             <dd>{info.hours}</dd>
           </div>
           <div>
-            <dt>Telefon</dt>
+            <dt>{t.branches.phone}</dt>
             <dd>
               <a href={`tel:${info.phone.replace(/\s/g, "")}`}>{info.phone}</a>
             </dd>
@@ -47,7 +50,7 @@ export default function BranchMap() {
         </dl>
 
         <a href={info.map} target="_blank" rel="noopener noreferrer" className="btn-block">
-          Xaritada ochish ↗
+          {t.branches.openMap}
         </a>
       </div>
 
@@ -55,7 +58,7 @@ export default function BranchMap() {
         <iframe
           key={active}
           src={info.embed}
-          title={`${branchNames[active]} filiali xaritada`}
+          title={t.branches.mapTitle(t.branchNames[active])}
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           allowFullScreen

@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { branches, branchNames } from "@/lib/data";
+import { branches } from "@/lib/data";
+import { getDictionary, localePath } from "@/lib/i18n";
+import LangSwitch from "../../../lang-switch";
 
 function formatPhone(digits) {
   return [digits.slice(0, 2), digits.slice(2, 5), digits.slice(5, 7), digits.slice(7, 9)]
@@ -30,7 +32,8 @@ function GlobeIcon() {
 }
 
 // course va branch berilmasa, bu umumiy ariza sahifasi: fan tanlanmaydi va yuborilmaydi.
-export default function CourseContent({ branch = null, course = null, courseName = null }) {
+export default function CourseContent({ lang, branch = null, course = null }) {
+  const t = getDictionary(lang);
   const router = useRouter();
   const [step, setStep] = useState("location");
   const [selectedBranch, setSelectedBranch] = useState(branch);
@@ -58,7 +61,7 @@ export default function CourseContent({ branch = null, course = null, courseName
     setSelectedBranch(nextBranch);
     setOtherCity(false);
     setStep("form");
-    if (course) window.history.replaceState(null, "", `/${nextBranch}/${course}`);
+    if (course) window.history.replaceState(null, "", localePath(lang, `/${nextBranch}/${course}`));
   }
 
   async function submit() {
@@ -76,21 +79,22 @@ export default function CourseContent({ branch = null, course = null, courseName
           branch: otherCity ? null : selectedBranch,
           course,
           otherCity,
+          lang,
         }),
       });
 
       if (!response.ok) throw new Error("send failed");
     } catch {
       setSending(false);
-      setSendError("Ariza yuborilmadi. Iltimos, qayta urinib ko'ring yoki bizga qo'ng'iroq qiling.");
+      setSendError(t.form.sendError);
       return;
     }
 
     if (course) {
-      router.push(`/${selectedBranch}/${course}/thank-you`);
+      router.push(localePath(lang, `/${selectedBranch}/${course}/thank-you`));
     } else {
       router.push(
-        selectedBranch && !otherCity ? `/ariza/thank-you?filial=${selectedBranch}` : "/ariza/thank-you"
+        localePath(lang, selectedBranch && !otherCity ? `/ariza/thank-you?filial=${selectedBranch}` : "/ariza/thank-you")
       );
     }
   }
@@ -109,19 +113,29 @@ export default function CourseContent({ branch = null, course = null, courseName
   return (
     <main className="course-page">
       <header className="site-header">
-        <img src="/logo.png" alt="Taraqqiyot o'quv markazi" className="site-logo" />
-        <span className="site-name">TARAQQIYOT TEACHING CENTER</span>
+        <Link href={localePath(lang, "/")} className="site-brand">
+          <img src="/logo.png" alt={t.logoAlt} className="site-logo" />
+          <span className="site-name">{t.siteNameUpper}</span>
+        </Link>
+        <LangSwitch
+          lang={lang}
+          path={course ? `/${selectedBranch}/${course}` : "/ariza"}
+          className="lang-switch-page"
+        />
       </header>
 
       <section className="hero-section">
         <h1>
           {course ? (
             <>
-              <strong>{courseName}</strong> kursi
+              {t.form.courseTitle[0]}
+              <strong>{t.courseNames[course]}</strong>
+              {t.form.courseTitle[1]}
             </>
           ) : (
             <>
-              <strong>Ariza</strong> qoldirish
+              <strong>{t.form.applyTitle[0]}</strong>
+              {t.form.applyTitle[1]}
             </>
           )}
         </h1>
@@ -129,8 +143,8 @@ export default function CourseContent({ branch = null, course = null, courseName
 
       {step === "location" && (
         <section className="step-card">
-          <h2>O'zingizga ma'qul joyni belgilang</h2>
-          <p className="step-hint">Sizga eng yaqin filialni tanlang</p>
+          <h2>{t.form.locationTitle}</h2>
+          <p className="step-hint">{t.form.locationHint}</p>
 
           <div className="location-options">
             {branches.map((item) => (
@@ -144,8 +158,8 @@ export default function CourseContent({ branch = null, course = null, courseName
                   <PinIcon />
                 </span>
                 <span className="location-text">
-                  <strong>{branchNames[item]} yaqini</strong>
-                  <small>Namangan shahri</small>
+                  <strong>{t.form.near(t.branchNames[item])}</strong>
+                  <small>{t.form.city}</small>
                 </span>
                 <span className="location-arrow" aria-hidden="true">›</span>
               </button>
@@ -159,8 +173,8 @@ export default function CourseContent({ branch = null, course = null, courseName
                 <GlobeIcon />
               </span>
               <span className="location-text">
-                <strong>Boshqa shahar</strong>
-                <small>Boshqa hudud</small>
+                <strong>{t.form.otherCity}</strong>
+                <small>{t.form.otherRegion}</small>
               </span>
               <span className="location-arrow" aria-hidden="true">›</span>
             </button>
@@ -170,8 +184,8 @@ export default function CourseContent({ branch = null, course = null, courseName
 
       {step === "unavailable" && (
         <section className="step-card">
-          <h2>Kechirasiz</h2>
-          <p className="step-hint">Bizning bu hududda filiallarimiz mavjud emas.</p>
+          <h2>{t.form.sorryTitle}</h2>
+          <p className="step-hint">{t.form.sorryText}</p>
 
           <div className="step-actions">
             <button
@@ -182,10 +196,10 @@ export default function CourseContent({ branch = null, course = null, courseName
                 setStep("form");
               }}
             >
-              Borib o'qiy olaman
+              {t.form.canCome}
             </button>
-            <Link href="/" className="step-secondary">
-              Ortga qaytish
+            <Link href={localePath(lang, "/")} className="step-secondary">
+              {t.form.back}
             </Link>
           </div>
         </section>
@@ -193,7 +207,7 @@ export default function CourseContent({ branch = null, course = null, courseName
 
       {step === "form" && (
         <section className="step-card">
-          <h2>Ariza qoldiring</h2>
+          <h2>{t.form.title}</h2>
 
           <form
             className="application-form"
@@ -203,16 +217,16 @@ export default function CourseContent({ branch = null, course = null, courseName
                 setPhoneError("");
                 setShowConfirmation(true);
               } else {
-                setPhoneError("Telefon raqamini to'liq kiriting: +998 dan keyin 9 ta raqam bo'lishi kerak.");
+                setPhoneError(t.form.phoneError);
               }
             }}
           >
             <label>
-              <span>Ismingiz</span>
+              <span>{t.form.name}</span>
               <input
                 name="name"
                 type="text"
-                placeholder="Ismingiz"
+                placeholder={t.form.name}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 maxLength={80}
@@ -220,7 +234,7 @@ export default function CourseContent({ branch = null, course = null, courseName
               />
             </label>
             <label>
-              <span>Telefon raqamingiz</span>
+              <span>{t.form.phone}</span>
               <input
                 name="phone"
                 type="tel"
@@ -232,7 +246,9 @@ export default function CourseContent({ branch = null, course = null, courseName
               />
             </label>
             {phoneError && <p className="phone-error">{phoneError}</p>}
-            <button type="submit">Arizani yuborish <span aria-hidden="true">→</span></button>
+            <button type="submit">
+              {t.form.submit} <span aria-hidden="true">→</span>
+            </button>
           </form>
 
           {showConfirmation && (
@@ -243,14 +259,14 @@ export default function CourseContent({ branch = null, course = null, courseName
                 aria-modal="true"
                 onClick={(event) => event.stopPropagation()}
               >
-                <p>Bu telefon raqamingiz to'g'rimi?</p>
+                <p>{t.form.confirm}</p>
                 <strong>+998 {formatPhone(phoneDigits)}</strong>
                 <div className="confirmation-actions">
                   <button type="button" onClick={() => setShowConfirmation(false)} disabled={sending}>
-                    Yo'q
+                    {t.form.no}
                   </button>
                   <button type="button" onClick={submit} disabled={sending}>
-                    {sending ? "Yuborilmoqda…" : "Ha, yuborish"}
+                    {sending ? t.form.sending : t.form.yes}
                   </button>
                 </div>
                 {sendError && <p className="send-error">{sendError}</p>}

@@ -263,6 +263,27 @@ const art = {
       <rect x="60" y="20" width="10" height="12" fill="#a70e07" />
     </svg>
   ),
+  "suniy-intellekt": (
+    <svg {...flagProps}>
+      <rect width="90" height="60" fill="#fff" />
+      <g stroke="#f0dcd6" strokeWidth="0.5">
+        <path d="M0 10h90M0 20h90M0 30h90M0 40h90M0 50h90" />
+        <path d="M10 0v60M20 0v60M30 0v60M40 0v60M50 0v60M60 0v60M70 0v60M80 0v60" />
+      </g>
+      <g stroke="#1b100e" strokeWidth="1.8" strokeLinecap="round">
+        <path d="M37 10v6M45 10v6M53 10v6M37 44v6M45 44v6M53 44v6M24 22h6M24 30h6M24 38h6M60 22h6M60 30h6M60 38h6" />
+      </g>
+      <rect x="30" y="16" width="30" height="28" rx="3" fill="#a70e07" stroke="#1b100e" strokeWidth="1.8" />
+      <text x="45" y="35.5" textAnchor="middle" fontSize="13" fontWeight="800" fill="#fff">
+        AI
+      </text>
+      <g fill="#a70e07">
+        <circle cx="14" cy="12" r="2" />
+        <circle cx="76" cy="50" r="2" />
+        <circle cx="78" cy="12" r="1.5" />
+      </g>
+    </svg>
+  ),
 };
 
 export default function Stamp({ course, className = "" }) {
