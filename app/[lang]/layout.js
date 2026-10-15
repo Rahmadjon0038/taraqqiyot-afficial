@@ -64,8 +64,9 @@ export async function generateMetadata({ params }) {
       url: alternatesFor(lang, "/").canonical,
       title: t.meta.ogTitle,
       description: t.meta.description,
+      images: [{ url: "/opengraph-image.png", width: 1200, height: 630 }],
     },
-    twitter: { card: "summary_large_image" },
+    twitter: { card: "summary_large_image", images: ["/opengraph-image.png"] },
     robots: { index: true, follow: true },
     formatDetection: { telephone: true },
   };
