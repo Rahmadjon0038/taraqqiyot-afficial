@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import LazyFrame from "./lazy-frame";
 import { branchInfo } from "@/lib/data";
 import { getDictionary } from "@/lib/i18n";
 
@@ -55,11 +56,12 @@ export default function BranchMap({ lang }) {
       </div>
 
       <div className="branch-frame">
-        <iframe
+        <LazyFrame
           key={active}
+          className="lazy-frame"
+          rootMargin="150px 0px"
           src={info.embed}
           title={t.branches.mapTitle(t.branchNames[active])}
-          loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           allowFullScreen
         />

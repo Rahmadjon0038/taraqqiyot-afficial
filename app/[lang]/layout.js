@@ -23,6 +23,7 @@ const oswald = Oswald({
   subsets: ["cyrillic"],
   weight: "700",
   variable: "--font-display-cyr",
+  preload: false,
   fallback: [],
   adjustFontFallback: false,
 });
@@ -31,12 +32,14 @@ const mono = JetBrains_Mono({
   subsets: ["latin", "cyrillic"],
   weight: ["500", "700"],
   variable: "--font-mono",
+  preload: false,
 });
 
 const caveat = Caveat({
   subsets: ["latin", "cyrillic"],
   weight: ["600", "700"],
   variable: "--font-hand",
+  preload: false,
 });
 
 export function generateStaticParams() {

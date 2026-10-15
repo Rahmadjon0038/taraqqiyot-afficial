@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BranchMap from "../branch-map";
 import CertificateCarousel from "../certificate-carousel";
+import LazyFrame from "../lazy-frame";
 import Stamp from "../course-art";
 import LangSwitch from "../lang-switch";
 import { branches, instagramVideos } from "@/lib/data";
@@ -237,10 +238,11 @@ export default async function Home({ params }) {
                   </p>
                   <div className="home-video-frame">
                     {url ? (
-                      <iframe
+                      <LazyFrame
+                        className="lazy-frame lazy-frame-fill"
+                        rootMargin="0px 120px"
                         src={embedUrl(url)}
                         title={`Instagram video ${index + 1}`}
-                        loading="lazy"
                         scrolling="no"
                         sandbox="allow-scripts allow-same-origin"
                         allow="autoplay; encrypted-media; picture-in-picture"
