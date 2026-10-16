@@ -11,6 +11,10 @@ services:
     restart: unless-stopped
     # Token va guruh ID faqat shu yerdan, konteyner ishga tushganda beriladi.
     env_file: .env
+    environment:
+      LEADS_LOG: /data/leads.jsonl
+    volumes:
+      - leads-data:/data
     ports:
       - "${BIND_ADDRESS:-127.0.0.1}:${HOST_PORT:-3800}:3000"
     healthcheck:
@@ -19,3 +23,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
+
+volumes:
+  leads-data:

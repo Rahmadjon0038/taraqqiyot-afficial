@@ -31,6 +31,15 @@ function GlobeIcon() {
   );
 }
 
+// Reklama manbasi (utm belgilari). Uni <AdSource /> sahifa ochilganda saqlab qo'yadi.
+function readAdSource() {
+  try {
+    return JSON.parse(sessionStorage.getItem("ad-source") ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
 // course va branch berilmasa, bu umumiy ariza sahifasi: fan tanlanmaydi va yuborilmaydi.
 export default function CourseContent({ lang, branch = null, course = null }) {
   const t = getDictionary(lang);
@@ -80,6 +89,7 @@ export default function CourseContent({ lang, branch = null, course = null }) {
           course,
           otherCity,
           lang,
+          source: readAdSource(),
         }),
       });
 

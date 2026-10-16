@@ -1,12 +1,25 @@
 import { branches, branchNames, courseNames, courses } from "@/lib/data";
+import { logEvent } from "@/lib/leads-log";
+import { chatIdFromEnv, keyboard, tashkentTime, tg } from "@/lib/telegram";
 
-// Arizani Telegram kanaliga yuboradi. Token va kanal .env.local faylida turadi
+const SOURCE_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid"];
+
+// Reklama manbasi: faqat ma'lum kalitlar, qiymatlar qisqartiriladi.
+function cleanSource(raw) {
+  if (!raw || typeof raw !== "object") return {};
+
+  return Object.fromEntries(
+    SOURCE_KEYS.flatMap((key) => {
+      const value = typeof raw[key] === "string" ? raw[key].trim().slice(0, 120) : "";
+      return value ? [[key, value]] : [];
+    })
+  );
+}
+
+// Arizani Telegram guruhiga tugmalar bilan yuboradi. Token va guruh .env faylida turadi
 // (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID) va brauzerga hech qachon chiqmaydi.
 export async function POST(request) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-
-  if (!token || !chatId) {
+  if (!process.env.TELEGRAM_BOT_TOKEN || !chatIdFromEnv()) {
     console.error("Telegram sozlanmagan: TELEGRAM_BOT_TOKEN va TELEGRAM_CHAT_ID kerak.");
     return Response.json({ ok: false, error: "not_configured" }, { status: 500 });
   }
@@ -23,7 +36,8 @@ export async function POST(request) {
   const branch = branches.includes(body.branch) ? body.branch : null;
   const course = courses.includes(body.course) ? body.course : null;
   const otherCity = body.otherCity === true;
-  const language = { ru: "Ruscha", en: "Inglizcha" }[body.lang];
+  const lang = { ru: "ru", en: "en" }[body.lang] ?? "uz";
+  const source = cleanSource(body.source);
 
   if (!name || !/^998\d{9}$/.test(phone)) {
     return Response.json({ ok: false, error: "invalid" }, { status: 400 });
@@ -36,27 +50,34 @@ export async function POST(request) {
   } else if (branch) {
     lines.push(`📍 Filial: ${branchNames[branch]}`);
   }
-  if (language) lines.push(`🌐 Sayt tili: ${language}`);
-  lines.push(
-    `🕒 ${new Date().toLocaleString("ru-RU", { timeZone: "Asia/Tashkent" })}`
-  );
+  if (lang !== "uz") lines.push(`🌐 Sayt tili: ${lang === "ru" ? "Ruscha" : "Inglizcha"}`);
+  if (source.utm_campaign || source.utm_source) {
+    lines.push(`📣 Reklama: ${[source.utm_campaign, source.utm_source].filter(Boolean).join(" · ")}`);
+  }
+  lines.push(`🕒 ${tashkentTime(new Date(), true)}`);
 
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text: lines.join("\n") }),
-    });
+  const sent = await tg("sendMessage", {
+    chat_id: chatIdFromEnv(),
+    text: lines.join("\n"),
+    reply_markup: keyboard(),
+  });
 
-    if (!response.ok) {
-      const details = await response.json().catch(() => null);
-      console.error("Telegram xatosi:", response.status, details?.description);
-      return Response.json({ ok: false, error: "telegram" }, { status: 502 });
-    }
-  } catch (error) {
-    console.error("Telegramga ulanib bo'lmadi:", error.message);
+  if (!sent.ok) {
+    console.error("Telegram xatosi:", sent.status ?? "", sent.description);
     return Response.json({ ok: false, error: "telegram" }, { status: 502 });
   }
+
+  await logEvent({
+    type: "lead",
+    id: `${sent.result.chat.id}:${sent.result.message_id}`,
+    name,
+    phone,
+    branch,
+    course,
+    otherCity,
+    lang,
+    source,
+  });
 
   return Response.json({ ok: true });
 }

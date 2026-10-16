@@ -2,6 +2,7 @@ import Script from "next/script";
 import { notFound } from "next/navigation";
 import { Anton, Caveat, JetBrains_Mono, Manrope, Oswald } from "next/font/google";
 import "../globals.css";
+import AdSource from "../ad-source";
 import SiteFooter from "../site-footer";
 import { branches, branchInfo, siteName, siteUrl, socialLinks } from "@/lib/data";
 import { alternatesFor, getDictionary, isLocale, locales, ogLocales } from "@/lib/i18n";
@@ -147,6 +148,7 @@ export default async function RootLayout({ children, params }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd(lang)).replace(/</g, "\\u003c") }}
         />
+        <AdSource />
         {children}
         <SiteFooter lang={lang} />
       </body>

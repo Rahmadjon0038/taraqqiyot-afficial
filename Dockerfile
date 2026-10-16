@@ -28,6 +28,9 @@ COPY --from=builder --chown=node:node /app/public ./public
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 
+# Arizalar jurnali shu papkada saqlanadi (docker-compose uni doimiy volume'ga ulaydi).
+RUN mkdir -p /data && chown node:node /data
+
 USER node
 EXPOSE 3000
 CMD ["node", "server.js"]
