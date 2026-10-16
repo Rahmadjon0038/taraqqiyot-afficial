@@ -42,14 +42,17 @@ Har bir ariza Telegram guruhiga tushadi. Xabar tagida tugmalar bor: **⏳ Keladi
 Operator bosganda xabar o'zgaradi ("📌 Holat: 🎓 Keldi — @operator") va holat serverdagi jurnalga yoziladi.
 Holatni keyin boshqasiga almashtirish mumkin: oxirgisi hisoblanadi.
 
-Guruhda buyruqlar:
+Buyruqlar (arizalar guruhida va botga shaxsiy yozganda ishlaydi):
 
 | Buyruq | Nima qiladi |
 |---|---|
-| `/hisobot` | arizalar, holatlar, filial, kurs va reklama kampaniyasi bo'yicha hisobot |
-| `/hisobot 7` | faqat oxirgi 7 kun |
-| `/eksport` | barcha arizalar CSV fayl (Excel / Sheets'da ochiladi) |
-| `/eksport 30` | oxirgi 30 kun |
+| `/hisobot` | **bugun, 7 kun va 30 kun** bitta xabarda + tugmalar: batafsil (filial, kurs, kampaniya) va CSV |
+| `/kunlik` · `/haftalik` · `/oylik` | bugun / 7 kun / 30 kun uchun batafsil hisobot |
+| `/hisobot 14` | oxirgi 14 kun (istalgan son) |
+| `/eksport` · `/eksport 30` | arizalar CSV fayl (Excel / Sheets'da ochiladi) |
+
+Kim foydalana oladi: arizalar guruhi, `TELEGRAM_ALLOWED_CHATS` dagi guruhlar va arizalar guruhining a'zolari
+(botga shaxsiy yozganda). Begona guruhga qo'shilgan bot hisobot bermaydi, chunki hisobotda mijozlar telefoni bor.
 
 ### Birinchi marta sozlash (serverda, bir marta)
 
@@ -63,7 +66,12 @@ set -a && . ./.env && set +a && curl -s "https://api.telegram.org/bot$TELEGRAM_B
   -d 'allowed_updates=["callback_query","message"]'
 ```
 
-`{"ok":true,...}` chiqsa, tayyor. Jurnal fayl `leads-data` volume'ida (`/data/leads.jsonl`) turadi va qayta yig'ilganda yo'qolmaydi.
+`{"ok":true,...}` chiqsa, tayyor. Telegram'dagi "/" menyusida buyruqlar ko'rinishi uchun (ixtiyoriy):
+
+```bash
+curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setMyCommands" -d 'commands=[{"command":"hisobot","description":"Bugun, 7 va 30 kunlik hisobot"},{"command":"kunlik","description":"Bugungi hisobot"},{"command":"haftalik","description":"Oxirgi 7 kun"},{"command":"oylik","description":"Oxirgi 30 kun"},{"command":"eksport","description":"Arizalar CSV fayl"}]'
+```
+ Jurnal fayl `leads-data` volume'ida (`/data/leads.jsonl`) turadi va qayta yig'ilganda yo'qolmaydi.
 
 ### Reklamadan qaysi ariza kelganini bilish
 

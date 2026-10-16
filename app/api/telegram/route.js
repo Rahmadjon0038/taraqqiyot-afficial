@@ -1,27 +1,65 @@
-import { buildCsv, buildReport, logEvent, readLeads } from "@/lib/leads-log";
+import { buildCsv, buildOverview, buildReport, logEvent, readLeads } from "@/lib/leads-log";
 import { STATUSES, STATUS_PREFIX, isAllowed, keyboard, statusByCode, tashkentTime, tg } from "@/lib/telegram";
 
 // Telegram shu manzilga tugma bosilishlarini va buyruqlarni yuboradi.
 // Manzilni Telegram'ga bir marta ro'yxatdan o'tkazish kerak (README'da yozilgan).
 
+const HELP = [
+  "Buyruqlar:",
+  "/hisobot — bugun, 7 kun va 30 kunlik hisobot (tugmalar bilan batafsil)",
+  "/kunlik — bugungi batafsil hisobot",
+  "/haftalik — oxirgi 7 kun",
+  "/oylik — oxirgi 30 kun",
+  "/eksport — barcha arizalar CSV fayl",
+  "/eksport 14 — oxirgi 14 kun (istalgan son)",
+].join("\n");
+
+// Bosh hisobot tagidagi tugmalar.
+const REPORT_KEYBOARD = {
+  inline_keyboard: [
+    [
+      { text: "📅 Bugun", callback_data: "r:d" },
+      { text: "📅 7 kun", callback_data: "r:w" },
+      { text: "📅 30 kun", callback_data: "r:m" },
+    ],
+    [
+      { text: "📊 Butun davr", callback_data: "r:a" },
+      { text: "📥 CSV fayl", callback_data: "x:a" },
+    ],
+  ],
+};
+
+const REPORT_PERIODS = { d: "today", w: 7, m: 30, a: null };
+
 function operatorName(user) {
   return user.username ? `@${user.username}` : [user.first_name, user.last_name].filter(Boolean).join(" ");
 }
 
-async function handleButton(query) {
+async function sendReport(chatId, period) {
+  await tg("sendMessage", { chat_id: chatId, text: buildReport(await readLeads(period), period) });
+}
+
+async function sendCsv(chatId, period) {
+  const leads = await readLeads(period);
+  const form = new FormData();
+  form.append("chat_id", String(chatId));
+  form.append("caption", `Arizalar: ${leads.length} ta${typeof period === "number" ? `, oxirgi ${period} kun` : ""}`);
+  form.append("document", new Blob([buildCsv(leads)], { type: "text/csv" }), "arizalar.csv");
+  await tg("sendDocument", form);
+}
+
+// Ruxsatsiz joyda javob: egasi o'zi tuzata olishi uchun ID ni ko'rsatamiz.
+async function denyAccess(chat, userId) {
+  const text =
+    chat.type === "private"
+      ? `Ruxsat yo'q. Sizning ID raqamingiz: ${userId}\nArizalar guruhining a'zosi bo'lsangiz, ruxsat o'zi beriladi; yoki ID ni bot egasiga yuboring.`
+      : `Bu guruhga hisobot berish ruxsat etilmagan. Guruh ID: ${chat.id}\nEgasi uni serverdagi TELEGRAM_ALLOWED_CHATS ga qo'shishi kerak.`;
+
+  await tg("sendMessage", { chat_id: chat.id, text });
+}
+
+async function handleStatusButton(query, statusKey) {
   const message = query.message;
-  const statusKey = query.data?.startsWith("s:") ? statusByCode(query.data.slice(2)) : null;
-
-  if (!message || !statusKey) {
-    await tg("answerCallbackQuery", { callback_query_id: query.id });
-    return;
-  }
-
-  if (!isAllowed(message.chat.id, query.from.id)) {
-    await tg("answerCallbackQuery", { callback_query_id: query.id, text: "Ruxsat yo'q", show_alert: true });
-    return;
-  }
-
   const label = STATUSES[statusKey].label;
   const original = message.text ?? "";
 
@@ -55,36 +93,65 @@ async function handleButton(query) {
   await tg("answerCallbackQuery", { callback_query_id: query.id, text: `Belgilandi: ${label}` });
 }
 
+async function handleButton(query) {
+  const message = query.message;
+  const [kind, value] = String(query.data ?? "").split(":");
+
+  if (!message || !["s", "r", "x"].includes(kind)) {
+    await tg("answerCallbackQuery", { callback_query_id: query.id });
+    return;
+  }
+
+  if (!(await isAllowed(message.chat, query.from.id))) {
+    await tg("answerCallbackQuery", { callback_query_id: query.id, text: "Ruxsat yo'q", show_alert: true });
+    return;
+  }
+
+  if (kind === "s") {
+    const statusKey = statusByCode(value);
+    if (statusKey) await handleStatusButton(query, statusKey);
+    else await tg("answerCallbackQuery", { callback_query_id: query.id });
+    return;
+  }
+
+  await tg("answerCallbackQuery", { callback_query_id: query.id });
+
+  if (kind === "r" && value in REPORT_PERIODS) await sendReport(message.chat.id, REPORT_PERIODS[value]);
+  if (kind === "x") await sendCsv(message.chat.id, null);
+}
+
 async function handleCommand(message) {
-  const match = message.text?.match(/^\/(hisobot|eksport|start|help)(?:@\w+)?(?:\s+(\d{1,4}))?/i);
+  const match = message.text?.match(/^\/(hisobot|kunlik|haftalik|oylik|eksport|start|help)(?:@\w+)?(?:\s+(\d{1,4}))?/i);
   if (!match) return;
 
-  const chatId = message.chat.id;
-  if (!isAllowed(chatId, message.from?.id)) return;
+  const chat = message.chat;
+  if (!(await isAllowed(chat, message.from?.id))) {
+    await denyAccess(chat, message.from?.id);
+    return;
+  }
 
   const command = match[1].toLowerCase();
   const days = match[2] ? Number(match[2]) : null;
 
   if (command === "start" || command === "help") {
+    await tg("sendMessage", { chat_id: chat.id, text: HELP });
+  } else if (command === "hisobot" && !days) {
     await tg("sendMessage", {
-      chat_id: chatId,
-      text: "Buyruqlar:\n/hisobot — arizalar hisoboti (butun davr)\n/hisobot 7 — oxirgi 7 kun\n/eksport — barcha arizalar (CSV fayl)\n/eksport 30 — oxirgi 30 kun",
+      chat_id: chat.id,
+      text: buildOverview(await readLeads()),
+      reply_markup: REPORT_KEYBOARD,
     });
-    return;
+  } else if (command === "hisobot") {
+    await sendReport(chat.id, days);
+  } else if (command === "kunlik") {
+    await sendReport(chat.id, "today");
+  } else if (command === "haftalik") {
+    await sendReport(chat.id, 7);
+  } else if (command === "oylik") {
+    await sendReport(chat.id, 30);
+  } else {
+    await sendCsv(chat.id, days);
   }
-
-  const leads = await readLeads(days);
-
-  if (command === "hisobot") {
-    await tg("sendMessage", { chat_id: chatId, text: buildReport(leads, days) });
-    return;
-  }
-
-  const form = new FormData();
-  form.append("chat_id", String(chatId));
-  form.append("caption", `Arizalar: ${leads.length} ta${days ? `, oxirgi ${days} kun` : ""}`);
-  form.append("document", new Blob([buildCsv(leads)], { type: "text/csv" }), "arizalar.csv");
-  await tg("sendDocument", form);
 }
 
 export async function POST(request) {
