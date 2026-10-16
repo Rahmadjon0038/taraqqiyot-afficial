@@ -1,4 +1,4 @@
-import { buildCsv, buildOverview, buildReport, logEvent, readLeads } from "@/lib/leads-log";
+import { buildCsv, buildLeadList, buildOverview, buildReport, logEvent, readLeads } from "@/lib/leads-log";
 import { STATUSES, STATUS_PREFIX, isAllowed, keyboard, statusByCode, tashkentTime, tg } from "@/lib/telegram";
 
 // Telegram shu manzilga tugma bosilishlarini va buyruqlarni yuboradi.
@@ -6,7 +6,7 @@ import { STATUSES, STATUS_PREFIX, isAllowed, keyboard, statusByCode, tashkentTim
 
 const HELP = [
   "Buyruqlar:",
-  "/hisobot — bugun, 7 kun va 30 kunlik hisobot (tugmalar bilan batafsil)",
+  "/hisobot — bugun, 7 kun va 30 kunlik hisobot (tugmalar bilan batafsil: statistika va har bir ariza)",
   "/kunlik — bugungi batafsil hisobot",
   "/haftalik — oxirgi 7 kun",
   "/oylik — oxirgi 30 kun",
@@ -35,8 +35,15 @@ function operatorName(user) {
   return user.username ? `@${user.username}` : [user.first_name, user.last_name].filter(Boolean).join(" ");
 }
 
+// Batafsil hisobot: avval statistika, keyin har bir ariza alohida ro'yxatda.
 async function sendReport(chatId, period) {
-  await tg("sendMessage", { chat_id: chatId, text: buildReport(await readLeads(period), period) });
+  const leads = await readLeads(period);
+
+  await tg("sendMessage", { chat_id: chatId, text: buildReport(leads, period) });
+
+  for (const text of buildLeadList(leads)) {
+    await tg("sendMessage", { chat_id: chatId, text });
+  }
 }
 
 async function sendCsv(chatId, period) {
