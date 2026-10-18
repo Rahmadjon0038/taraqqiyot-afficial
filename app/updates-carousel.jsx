@@ -7,17 +7,12 @@ import { getDictionary, localePath } from "@/lib/i18n";
 
 const slideDuration = 3000;
 const swipeThreshold = 48;
-const defaultSlides = [
-  { id: "default-news", type: "news", title: "Yangi kurslar ochildi", image: "/ads/banner-01.png", targetUrl: "#" },
-  { id: "default-course", type: "course", title: "Turk tili kursi", image: "/ads/banner-02.png", course: "turk-tili" },
-  { id: "default-vacancy", type: "vacancy", title: "O'qituvchi vakansiyasi", image: "/ads/banner-03.png", applicationType: "teacher-vacancy" },
-];
 
 export default function UpdatesCarousel({ lang }) {
   const t = getDictionary(lang).updates;
   const pointerStartX = useRef(null);
   const suppressClick = useRef(false);
-  const [slides, setSlides] = useState(defaultSlides);
+  const [slides, setSlides] = useState([]);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [failedImages, setFailedImages] = useState({});
@@ -30,14 +25,19 @@ export default function UpdatesCarousel({ lang }) {
     async function loadSlides() {
       try {
         const response = await fetch("/api/announcements", { cache: "no-store" });
-        if (!response.ok) return;
+        if (!response.ok) {
+          throw new Error(`Announcements request failed with status ${response.status}`);
+        }
         const data = await response.json();
-        if (!ignore && Array.isArray(data.items) && data.items.length) {
+        if (!Array.isArray(data.items)) {
+          throw new Error("Announcements response did not contain an items list");
+        }
+        if (!ignore) {
           setSlides(data.items);
           setIndex(0);
         }
-      } catch {
-        // Fall back to local defaults.
+      } catch (error) {
+        if (!ignore) console.error("Could not load announcements:", error);
       }
     }
 
@@ -135,6 +135,8 @@ export default function UpdatesCarousel({ lang }) {
     return () => window.clearTimeout(timer);
   }, [activeKey, availableSlides, paused]);
 
+  if (!activeSlide) return null;
+
   return (
     <section className="home-updates" aria-label={t.sectionLabel}>
       <div
@@ -153,18 +155,17 @@ export default function UpdatesCarousel({ lang }) {
           if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
         }}
       >
-        {activeSlide && (
-          <Image
-            key={activeSlide.id || activeSlide.image}
-            src={activeSlide.image || "/ads/banner-01.png"}
-            alt={activeSlide.title || t.bannerAlt(activeIndex + 1)}
-            fill
-            priority
-            draggable={false}
-            sizes="(max-width: 560px) calc(100vw - 24px), (max-width: 1472px) calc(100vw - 32px), 1440px"
-            onError={() => setFailedImages((current) => ({ ...current, [activeIndex]: true }))}
-          />
-        )}
+        <Image
+          key={activeSlide.id || activeSlide.image}
+          src={activeSlide.image}
+          alt={activeSlide.title || t.bannerAlt(activeIndex + 1)}
+          fill
+          priority
+          unoptimized
+          draggable={false}
+          sizes="(max-width: 560px) calc(100vw - 24px), (max-width: 1472px) calc(100vw - 32px), 1440px"
+          onError={() => setFailedImages((current) => ({ ...current, [activeIndex]: true }))}
+        />
 
         {activeSlide?.type === "news" ? (
           <button
@@ -209,11 +210,7 @@ export default function UpdatesCarousel({ lang }) {
           </div>
         </div>
         <div className="home-updates-actions">
-          {activeSlide?.type === "news" ? (
-            <button type="button" className="home-updates-apply" onClick={() => setActiveModal(activeSlide)}>
-              {t.apply}
-            </button>
-          ) : (
+          {activeSlide.type !== "news" && (
             <Link href={activeHref} className="home-updates-apply">
               {t.apply}
             </Link>
@@ -242,7 +239,7 @@ export default function UpdatesCarousel({ lang }) {
               ×
             </button>
             <div style={{ position: "relative", width: "100%", height: 360 }}>
-              <Image src={activeModal.image || "/ads/banner-01.png"} alt={activeModal.title} fill style={{ objectFit: "cover" }} sizes="100vw" />
+              <Image src={activeModal.image} alt={activeModal.title} fill unoptimized style={{ objectFit: "cover" }} sizes="100vw" />
             </div>
             <div style={{ padding: 24 }}>
               <p style={{ textTransform: "uppercase", letterSpacing: 2, color: "#d62728", fontSize: 12, fontWeight: 700, margin: "0 0 12px" }}>

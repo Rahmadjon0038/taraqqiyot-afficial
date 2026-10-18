@@ -44,44 +44,9 @@ Home page dagi `UpdatesCarousel` e'lonlarni DM platformadagi **Sayt e'lonlari** 
 ANNOUNCEMENTS_JSON_URL=https://ayubxon-api.inboxcrm.uz/api/announcements
 ```
 
-Local ishlashda `http://localhost:4100/api/announcements` ni ishlating. `public/announcements.json` backend feed vaqtincha ulanmaganida fallback hisoblanadi. Feed formatiga misol:
+Local ishlashda `http://localhost:4100/api/announcements` ni ishlating. Marketing saytda statik e'lon yoki banner fallback yo'q: faol feed bo'lmasa karusel ko'rsatilmaydi.
 
-```json
-{
-  "items": [
-    {
-      "id": "news-01",
-      "type": "news",
-      "title": "Yangi kurslar ochildi",
-      "image": "https://.../banner.png",
-      "preview": "Qisqa ta'rif",
-      "description": "Batafsil matn",
-      "active": true,
-      "sort": 1
-    },
-    {
-      "id": "course-01",
-      "type": "course",
-      "title": "Turk tili",
-      "image": "https://.../course.png",
-      "course": "turk-tili",
-      "active": true,
-      "sort": 2
-    },
-    {
-      "id": "vacancy-01",
-      "type": "vacancy",
-      "title": "O'qituvchi vakansiyasi",
-      "image": "https://.../vacancy.png",
-      "applicationType": "teacher-vacancy",
-      "active": true,
-      "sort": 3
-    }
-  ]
-}
-```
-
-- `news` turi: faqat fullscreen modal ochiladi, ariza tugmasi chiqmaydi.
+- `news` turi: rasm va batafsil matn fullscreen modalda ochiladi, ariza tugmasi chiqmaydi.
 - `course` turi: kursga yo'naltirish bo'ladi (`/ariza?course=...`).
 - `vacancy` turi: lavozim nomi (`title`) bilan vakansiya formasiga yo'naltiriladi.
 - `targetUrl` bo'lsa, uni override sifatida ishlatish mumkin.

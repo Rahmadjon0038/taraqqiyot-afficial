@@ -6,6 +6,6 @@ export async function GET() {
     return Response.json({ items, updatedAt: new Date().toISOString() }, { status: 200 });
   } catch (error) {
     console.error("Announcements API error:", error);
-    return Response.json({ items: [], updatedAt: new Date().toISOString() }, { status: 500 });
+    return Response.json({ error: "Announcements are temporarily unavailable" }, { status: 502 });
   }
 }
