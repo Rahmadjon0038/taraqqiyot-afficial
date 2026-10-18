@@ -38,14 +38,13 @@ Kurslar, filiallar, sertifikatlar va Instagram videolar ro'yxati — `lib/data.j
 
 ## Dinamik e'lonlar / karusel
 
-Home page dagi `UpdatesCarousel` hozir JSON-feed orqali ishlaydi. Baza fayl: `public/announcements.json`.
-Agar Cloudflare R2 yoki boshqa public URL bo'lsa, `.env` ichiga quyidagicha yoziladi:
+Home page dagi `UpdatesCarousel` e'lonlarni DM platformadagi **Sayt e'lonlari** boshqaruv sahifasidan oladi. Rasmlar o'sha paneldan Cloudflare R2 ga yuklanadi. Marketing saytning server `.env` faylida feed manzilini belgilang:
 
 ```bash
-ANNOUNCEMENTS_JSON_URL=https://your-public-bucket.example.com/announcements.json
+ANNOUNCEMENTS_JSON_URL=https://ayubxon-api.inboxcrm.uz/api/announcements
 ```
 
-JSON format:
+Local ishlashda `http://localhost:4100/api/announcements` ni ishlating. `public/announcements.json` backend feed vaqtincha ulanmaganida fallback hisoblanadi. Feed formatiga misol:
 
 ```json
 {
@@ -84,7 +83,7 @@ JSON format:
 
 - `news` turi: faqat fullscreen modal ochiladi, ariza tugmasi chiqmaydi.
 - `course` turi: kursga yo'naltirish bo'ladi (`/ariza?course=...`).
-- `vacancy` turi: vakansiya formaga yo'naltirish bo'ladi (`/ariza?application=...`).
+- `vacancy` turi: lavozim nomi (`title`) bilan vakansiya formasiga yo'naltiriladi.
 - `targetUrl` bo'lsa, uni override sifatida ishlatish mumkin.
 - `sort` bo'yicha karusel tartibi aniqlanadi.
 

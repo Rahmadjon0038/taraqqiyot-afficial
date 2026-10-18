@@ -57,9 +57,15 @@ export default function UpdatesCarousel({ lang }) {
   const activeKey = activeSlide?.id ?? "default";
   const activeHref =
     activeSlide?.type === "course" && activeSlide?.course
-      ? localePath(lang, `/ariza?course=${encodeURIComponent(activeSlide.course)}`)
+      ? localePath(
+          lang,
+          `/ariza?course=${encodeURIComponent(activeSlide.course)}${activeSlide.branch ? `&branch=${encodeURIComponent(activeSlide.branch)}` : ""}`
+        )
       : activeSlide?.type === "vacancy" && activeSlide?.applicationType
-        ? localePath(lang, `/ariza?application=${encodeURIComponent(activeSlide.applicationType)}`)
+        ? localePath(
+            lang,
+            `/ariza?application=${encodeURIComponent(activeSlide.applicationType)}&vacancy_title=${encodeURIComponent(activeSlide.title)}${activeSlide.branch ? `&branch=${encodeURIComponent(activeSlide.branch)}` : ""}`
+          )
         : activeSlide?.targetUrl || localePath(lang, "/ariza");
 
   function go(step) {

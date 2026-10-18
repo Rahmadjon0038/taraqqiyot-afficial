@@ -56,7 +56,7 @@ export default async function TTCOfficialPage() {
                   textDecoration: "none",
                 }}
               >
-                {item.type === "news" ? "Batafsil ko&apos;rish" : item.type === "course" ? "Ariza yuborish" : "Vakansiyaga ariza"}
+                {item.type === "news" ? "Batafsil ko'rish" : item.type === "course" ? "Ariza yuborish" : "Vakansiyaga ariza"}
               </Link>
             </div>
           </article>

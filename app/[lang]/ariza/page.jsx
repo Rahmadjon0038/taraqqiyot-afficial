@@ -1,6 +1,6 @@
 import CourseContent from "../[branch]/[course]/course-content";
 import { ApplicationPageView } from "../../pixel-tracking";
-import { applicationTypes, courses } from "@/lib/data";
+import { applicationTypes, branches, courses } from "@/lib/data";
 import { alternatesFor, getDictionary } from "@/lib/i18n";
 
 export async function generateMetadata({ params }) {
@@ -16,12 +16,13 @@ export async function generateMetadata({ params }) {
 
 export default async function ApplicationPage({ params, searchParams }) {
   const { lang } = await params;
-  const { application, course: requestedCourse, vacancy_title: requestedVacancyTitle } = await searchParams;
+  const { application, branch: requestedBranch, course: requestedCourse, vacancy_title: requestedVacancyTitle } = await searchParams;
   const applicationType =
     typeof application === "string" && Object.hasOwn(applicationTypes, application) ? application : null;
   const course = typeof requestedCourse === "string" && courses.includes(requestedCourse)
     ? requestedCourse
     : null;
+  const branch = typeof requestedBranch === "string" && branches.includes(requestedBranch) ? requestedBranch : null;
   const vacancyTitle = typeof requestedVacancyTitle === "string" ? requestedVacancyTitle.trim() : "";
 
   return (
@@ -29,6 +30,7 @@ export default async function ApplicationPage({ params, searchParams }) {
       <ApplicationPageView />
       <CourseContent
         lang={lang}
+        branch={branch}
         applicationType={applicationType}
         course={course}
         vacancyTitle={vacancyTitle || (applicationType === "teacher-vacancy" ? applicationTypes[applicationType].name : "")}
