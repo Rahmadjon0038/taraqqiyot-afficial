@@ -46,7 +46,7 @@ ANNOUNCEMENTS_JSON_URL=https://ayubxon-api.inboxcrm.uz/api/announcements
 
 Local ishlashda `http://localhost:4100/api/announcements` ni ishlating. Marketing saytda statik e'lon yoki banner fallback yo'q: faol feed bo'lmasa karusel ko'rsatilmaydi.
 
-- `news` turi: rasm va batafsil matn fullscreen modalda ochiladi, ariza tugmasi chiqmaydi.
+- `news` turi: faqat banner rasmi fullscreen ochiladi, ariza tugmasi chiqmaydi.
 - `course` turi: kursga yo'naltirish bo'ladi (`/ariza?course=...`).
 - `vacancy` turi: lavozim nomi (`title`) bilan vakansiya formasiga yo'naltiriladi.
 - `targetUrl` bo'lsa, uni override sifatida ishlatish mumkin.

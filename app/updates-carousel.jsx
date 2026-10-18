@@ -222,34 +222,23 @@ export default function UpdatesCarousel({ lang }) {
         <div
           role="dialog"
           aria-modal="true"
+          aria-label={activeModal.title}
           onClick={() => setActiveModal(null)}
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(17, 24, 39, 0.8)",
+            background: "rgba(0, 0, 0, 0.94)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             zIndex: 1000,
-            padding: 20,
           }}
         >
-          <div onClick={(event) => event.stopPropagation()} style={{ position: "relative", width: "min(980px, 100%)", maxHeight: "90vh", overflow: "auto", borderRadius: 24, background: "#fff", boxShadow: "0 30px 90px rgba(0,0,0,0.2)" }}>
-            <button type="button" onClick={() => setActiveModal(null)} aria-label="Close" style={{ position: "absolute", top: 16, right: 16, width: 40, height: 40, borderRadius: "50%", border: "none", background: "rgba(17,24,39,0.08)", fontSize: 22, cursor: "pointer" }}>
+          <div onClick={(event) => event.stopPropagation()} style={{ position: "relative", width: "100vw", height: "100dvh" }}>
+            <button type="button" onClick={() => setActiveModal(null)} aria-label="Close image" style={{ position: "absolute", zIndex: 1, top: 16, right: 16, width: 44, height: 44, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.5)", background: "rgba(0,0,0,0.55)", color: "#fff", fontSize: 26, cursor: "pointer" }}>
               ×
             </button>
-            <div style={{ position: "relative", width: "100%", height: 360 }}>
-              <Image src={activeModal.image} alt={activeModal.title} fill unoptimized style={{ objectFit: "cover" }} sizes="100vw" />
-            </div>
-            <div style={{ padding: 24 }}>
-              <p style={{ textTransform: "uppercase", letterSpacing: 2, color: "#d62728", fontSize: 12, fontWeight: 700, margin: "0 0 12px" }}>
-                {activeModal.type === "news" ? "Yangilik" : activeModal.type === "course" ? "Kurs" : "Vakansiya"}
-              </p>
-              <h3 style={{ fontSize: 32, margin: "0 0 12px" }}>{activeModal.title}</h3>
-              <p style={{ color: "#4b5563", lineHeight: 1.7, margin: 0 }}>
-                {activeModal.description || activeModal.preview || "Batafsil ma'lumot tez orada qo'shiladi."}
-              </p>
-            </div>
+            <Image src={activeModal.image} alt={activeModal.title} fill unoptimized style={{ objectFit: "contain" }} sizes="100vw" />
           </div>
         </div>
       )}
