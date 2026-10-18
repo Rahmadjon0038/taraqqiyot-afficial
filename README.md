@@ -36,6 +36,58 @@ Token faqat serverdagi `.env` faylida turadi: git'ga ham, Docker image'ga ham, b
 
 Kurslar, filiallar, sertifikatlar va Instagram videolar ro'yxati — `lib/data.js`.
 
+## Dinamik e'lonlar / karusel
+
+Home page dagi `UpdatesCarousel` hozir JSON-feed orqali ishlaydi. Baza fayl: `public/announcements.json`.
+Agar Cloudflare R2 yoki boshqa public URL bo'lsa, `.env` ichiga quyidagicha yoziladi:
+
+```bash
+ANNOUNCEMENTS_JSON_URL=https://your-public-bucket.example.com/announcements.json
+```
+
+JSON format:
+
+```json
+{
+  "items": [
+    {
+      "id": "news-01",
+      "type": "news",
+      "title": "Yangi kurslar ochildi",
+      "image": "https://.../banner.png",
+      "preview": "Qisqa ta'rif",
+      "description": "Batafsil matn",
+      "active": true,
+      "sort": 1
+    },
+    {
+      "id": "course-01",
+      "type": "course",
+      "title": "Turk tili",
+      "image": "https://.../course.png",
+      "course": "turk-tili",
+      "active": true,
+      "sort": 2
+    },
+    {
+      "id": "vacancy-01",
+      "type": "vacancy",
+      "title": "O'qituvchi vakansiyasi",
+      "image": "https://.../vacancy.png",
+      "applicationType": "teacher-vacancy",
+      "active": true,
+      "sort": 3
+    }
+  ]
+}
+```
+
+- `news` turi: faqat fullscreen modal ochiladi, ariza tugmasi chiqmaydi.
+- `course` turi: kursga yo'naltirish bo'ladi (`/ariza?course=...`).
+- `vacancy` turi: vakansiya formaga yo'naltirish bo'ladi (`/ariza?application=...`).
+- `targetUrl` bo'lsa, uni override sifatida ishlatish mumkin.
+- `sort` bo'yicha karusel tartibi aniqlanadi.
+
 ## Arizalar va operator tugmalari
 
 Har bir ariza Telegram guruhiga tushadi. Xabar tagida tugmalar bor: **⏳ Keladi · 🎓 Keldi · 📞 Javob bermadi · ❌ Kelmaydi**.
@@ -78,6 +130,8 @@ curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setMyCommands" -d 'comm
 Reklama havolasiga `utm_campaign` qo'shing, masalan:
 `https://taraqqiyot-official.uz/davlatobod/turk-tili?utm_source=facebook&utm_campaign=turk-oktyabr`
 Ariza xabarida manba parametrlari `utm_source=facebook · utm_campaign=turk-oktyabr` ko'rinishida chiqadi.
+
+Bir xil telefon raqami bilan ayni filial va kursga avval ariza yuborilgan bo'lsa, yangi ariza qabul qilinmaydi. Tekshiruv arizalar jurnalidagi barcha yozuvlar bo'yicha amalga oshadi; boshqa filial yoki boshqa kursga ariza yuborish mumkin. Tizim odamni telefon raqami orqali aniqlaydi, shuning uchun boshqa raqam ishlatilsa, takroriy ariza aniqlanmaydi.
 
 ### Meta Pixel tekshiruvi
 

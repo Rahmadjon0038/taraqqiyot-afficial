@@ -16,17 +16,23 @@ export async function generateMetadata({ params }) {
 
 export default async function ApplicationPage({ params, searchParams }) {
   const { lang } = await params;
-  const { application, course: requestedCourse } = await searchParams;
+  const { application, course: requestedCourse, vacancy_title: requestedVacancyTitle } = await searchParams;
   const applicationType =
     typeof application === "string" && Object.hasOwn(applicationTypes, application) ? application : null;
   const course = typeof requestedCourse === "string" && courses.includes(requestedCourse)
     ? requestedCourse
     : null;
+  const vacancyTitle = typeof requestedVacancyTitle === "string" ? requestedVacancyTitle.trim() : "";
 
   return (
     <>
       <ApplicationPageView />
-      <CourseContent lang={lang} applicationType={applicationType} course={course} />
+      <CourseContent
+        lang={lang}
+        applicationType={applicationType}
+        course={course}
+        vacancyTitle={vacancyTitle || (applicationType === "teacher-vacancy" ? applicationTypes[applicationType].name : "")}
+      />
     </>
   );
 }

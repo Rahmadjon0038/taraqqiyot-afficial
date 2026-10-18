@@ -1,5 +1,5 @@
 import { applicationTypes, branches, branchNames, courseNames, courses } from "@/lib/data";
-import { logEvent } from "@/lib/leads-log";
+import { hasMatchingLead, logEvent, serializeLeadSubmissions } from "@/lib/leads-log";
 import { chatIdFromEnv, keyboard, tashkentTime, tg } from "@/lib/telegram";
 
 const SOURCE_KEYS = [
@@ -28,7 +28,7 @@ function cleanSource(raw) {
 
 // Arizani Telegram guruhiga tugmalar bilan yuboradi. Token va guruh .env faylida turadi
 // (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID) va brauzerga hech qachon chiqmaydi.
-export async function POST(request) {
+async function createLead(request) {
   if (!process.env.TELEGRAM_BOT_TOKEN || !chatIdFromEnv()) {
     console.error("Telegram sozlanmagan: TELEGRAM_BOT_TOKEN va TELEGRAM_CHAT_ID kerak.");
     return Response.json({ ok: false, error: "not_configured" }, { status: 500 });
@@ -49,6 +49,7 @@ export async function POST(request) {
     typeof body.applicationType === "string" && Object.hasOwn(applicationTypes, body.applicationType)
       ? body.applicationType
       : null;
+  const vacancyTitle = typeof body.vacancyTitle === "string" ? body.vacancyTitle.trim().slice(0, 200) : "";
   const otherCity = body.otherCity === true;
   const lang = { ru: "ru", en: "en" }[body.lang] ?? "uz";
   const source = cleanSource(body.source);
@@ -57,8 +58,13 @@ export async function POST(request) {
     return Response.json({ ok: false, error: "invalid" }, { status: 400 });
   }
 
+  if (await hasMatchingLead({ phone, branch, course, applicationType, otherCity })) {
+    return Response.json({ ok: false, error: "duplicate" }, { status: 409 });
+  }
+
   const lines = ["🆕 Yangi leads", "", `👤 Ism: ${name}`, `📞 Telefon: +${phone}`];
   if (applicationType) lines.push(`🎯 Murojaat: ${applicationTypes[applicationType].name}`);
+  if (vacancyTitle) lines.push(`📌 Lavozim: ${vacancyTitle}`);
   if (course) lines.push(`📚 Kurs: ${courseNames[course]}`);
   if (otherCity) {
     lines.push("📍 Boshqa shahardan (borib o'qiy oladi)");
@@ -90,10 +96,15 @@ export async function POST(request) {
     branch,
     course,
     applicationType,
+    vacancyTitle,
     otherCity,
     lang,
     source,
   });
 
   return Response.json({ ok: true });
+}
+
+export async function POST(request) {
+  return serializeLeadSubmissions(() => createLead(request));
 }

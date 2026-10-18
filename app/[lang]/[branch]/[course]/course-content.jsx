@@ -33,9 +33,11 @@ function GlobeIcon() {
 }
 
 // course va branch berilmasa, bu umumiy ariza sahifasi: fan tanlanmaydi va yuborilmaydi.
-export default function CourseContent({ lang, branch = null, course = null, applicationType = null }) {
+export default function CourseContent({ lang, branch = null, course = null, applicationType = null, vacancyTitle = "" }) {
   const t = getDictionary(lang);
   const application = applicationType ? applicationTypes[applicationType] : null;
+  const resolvedVacancyTitle =
+    applicationType === "teacher-vacancy" && vacancyTitle ? vacancyTitle : applicationType === "teacher-vacancy" ? applicationTypes[applicationType].name : "";
   const router = useRouter();
   const [step, setStep] = useState("location");
   const [selectedBranch, setSelectedBranch] = useState(branch);
@@ -84,12 +86,21 @@ export default function CourseContent({ lang, branch = null, course = null, appl
           branch: otherCity ? null : selectedBranch,
           course: course ?? application?.course ?? null,
           applicationType,
+          vacancyTitle: resolvedVacancyTitle,
           otherCity,
           lang,
           eventID,
           source: readAdSource(),
         }),
       });
+
+      const result = await response.json();
+      if (response.status === 409 && result.error === "duplicate") {
+        submissionInProgress.current = false;
+        setSending(false);
+        setSendError(t.form.duplicateApplication);
+        return;
+      }
 
       if (!response.ok) throw new Error("send failed");
     } catch {
@@ -108,6 +119,7 @@ export default function CourseContent({ lang, branch = null, course = null, appl
         language: lang,
         content_category: "course_lead",
         ...(trackedCourse ? { course: trackedCourse } : {}),
+        ...(resolvedVacancyTitle ? { vacancy_title: resolvedVacancyTitle } : {}),
       },
       { eventID }
     );
@@ -171,7 +183,7 @@ export default function CourseContent({ lang, branch = null, course = null, appl
         </h1>
         {application && (
           <p className="application-context">
-            {t.form.applicationFor} <strong>{t.updates.applicationTypes[applicationType]}</strong>
+            {t.form.applicationFor} <strong>{resolvedVacancyTitle || t.updates.applicationTypes[applicationType]}</strong>
           </p>
         )}
       </section>
