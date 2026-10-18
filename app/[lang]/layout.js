@@ -2,7 +2,7 @@ import Script from "next/script";
 import { notFound } from "next/navigation";
 import { Anton, Caveat, JetBrains_Mono, Manrope, Oswald } from "next/font/google";
 import "../globals.css";
-import AdSource from "../ad-source";
+import { PixelRouteTracker } from "../pixel-tracking";
 import SiteFooter from "../site-footer";
 import { branches, branchInfo, siteName, siteUrl, socialLinks } from "@/lib/data";
 import { alternatesFor, getDictionary, isLocale, locales, ogLocales } from "@/lib/i18n";
@@ -130,7 +130,7 @@ export default async function RootLayout({ children, params }) {
       <body
         className={`${manrope.variable} ${anton.variable} ${oswald.variable} ${mono.variable} ${caveat.variable}`}
       >
-        <Script id="meta-pixel" strategy="afterInteractive">
+        <Script id="meta-pixel" strategy="beforeInteractive">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -141,14 +141,24 @@ export default async function RootLayout({ children, params }) {
             s.parentNode.insertBefore(t,s)}(window, document, 'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '1861679368537163');
+            window.__taraqqiyotPixelPath = window.location.pathname;
             fbq('track', 'PageView');
           `}
         </Script>
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=1861679368537163&ev=PageView&noscript=1"
+            alt=""
+          />
+        </noscript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd(lang)).replace(/</g, "\\u003c") }}
         />
-        <AdSource />
+        <PixelRouteTracker />
         {children}
         <SiteFooter lang={lang} />
       </body>

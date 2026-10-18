@@ -2,7 +2,16 @@ import { applicationTypes, branches, branchNames, courseNames, courses } from "@
 import { logEvent } from "@/lib/leads-log";
 import { chatIdFromEnv, keyboard, tashkentTime, tg } from "@/lib/telegram";
 
-const SOURCE_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid"];
+const SOURCE_KEYS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "fbclid",
+  "gclid",
+  "fbcl",
+];
 
 // Reklama manbasi: faqat ma'lum kalitlar, qiymatlar qisqartiriladi.
 function cleanSource(raw) {
@@ -10,7 +19,8 @@ function cleanSource(raw) {
 
   return Object.fromEntries(
     SOURCE_KEYS.flatMap((key) => {
-      const value = typeof raw[key] === "string" ? raw[key].trim().slice(0, 120) : "";
+      const value =
+        typeof raw[key] === "string" ? raw[key].replace(/[\r\n\t]/g, " ").trim().slice(0, 120) : "";
       return value ? [[key, value]] : [];
     })
   );
@@ -56,8 +66,8 @@ export async function POST(request) {
     lines.push(`📍 Filial: ${branchNames[branch]}`);
   }
   if (lang !== "uz") lines.push(`🌐 Sayt tili: ${lang === "ru" ? "Ruscha" : "Inglizcha"}`);
-  if (source.utm_campaign || source.utm_source) {
-    lines.push(`📣 Reklama: ${[source.utm_campaign, source.utm_source].filter(Boolean).join(" · ")}`);
+  if (Object.keys(source).length) {
+    lines.push(`📣 Reklama: ${Object.entries(source).map(([key, value]) => `${key}=${value}`).join(" · ")}`);
   }
   lines.push(`🕒 ${tashkentTime(new Date(), true)}`);
 

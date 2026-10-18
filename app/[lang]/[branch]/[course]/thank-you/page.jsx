@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getDictionary, localePath } from "@/lib/i18n";
@@ -8,16 +7,6 @@ import { getDictionary, localePath } from "@/lib/i18n";
 export default function ThankYouPage() {
   const params = useParams();
   const t = getDictionary(params.lang);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.fbq) {
-      window.fbq("track", "Lead", {
-        branch: params.branch,
-        course: params.course,
-        language: params.lang,
-      });
-    }
-  }, [params.branch, params.course, params.lang]);
 
   return (
     <main className="course-page">

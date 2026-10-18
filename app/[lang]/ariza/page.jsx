@@ -1,4 +1,5 @@
 import CourseContent from "../[branch]/[course]/course-content";
+import { ApplicationPageView } from "../../pixel-tracking";
 import { applicationTypes } from "@/lib/data";
 import { alternatesFor, getDictionary } from "@/lib/i18n";
 
@@ -19,5 +20,10 @@ export default async function ApplicationPage({ params, searchParams }) {
   const applicationType =
     typeof application === "string" && Object.hasOwn(applicationTypes, application) ? application : null;
 
-  return <CourseContent lang={lang} applicationType={applicationType} />;
+  return (
+    <>
+      <ApplicationPageView />
+      <CourseContent lang={lang} applicationType={applicationType} />
+    </>
+  );
 }

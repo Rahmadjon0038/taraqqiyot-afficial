@@ -77,4 +77,12 @@ curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setMyCommands" -d 'comm
 
 Reklama havolasiga `utm_campaign` qo'shing, masalan:
 `https://taraqqiyot-official.uz/davlatobod/turk-tili?utm_source=facebook&utm_campaign=turk-oktyabr`
-Ariza xabarida "📣 Reklama: turk-oktyabr · facebook" chiqadi va hisobotda kampaniya bo'yicha ajraladi.
+Ariza xabarida manba parametrlari `utm_source=facebook · utm_campaign=turk-oktyabr` ko'rinishida chiqadi.
+
+### Meta Pixel tekshiruvi
+
+- Events Manager > Data Sources > Settings > Domains da `taraqqiyot-official.uz` ni verify qiling, keyin AEM da `Lead` ni 1-priority qiling.
+- Test uchun Events Manager > Test events bo'limini ochiq qoldirib, saytda ariza muvaffaqiyatli yuboring. `Lead` eventi `Processed` holatida, `branch`, `course`, `language` va `content_category` parametrlarini olganini tekshiring. Sayt brauzeridan kelgan eventda `TEST73435` kodini kodga qo'shish shart emas; bu kod Meta ko'rsatgan test server eventlari/CAPI so'roviga qo'shiladi.
+- Meta Pixel Helper extension'ida saytni ochganda bitta `PageView`, ariza sahifasiga kirganda `ViewContent`, arizani muvaffaqiyatli yuborganda bitta `Lead` ko'rinishini tekshiring. `Lead` tafsilotlarida filial va kurs parametrlarini ko'ring.
+- Hozirgi tracking formadagi ism yoki telefonni Meta Pixel'ga yubormaydi. Automatic Advanced Matching'ni faqat tegishli foydalanuvchi roziligi va maxfiylik xabarnomasi mavjud bo'lganda yoqing.
+- `app/api/capi/route.js` hozircha ishlamaydigan tayyorlov stub'i; u Meta'ga event yubormaydi. CAPI ishga tushirilganda browser `eventID` bilan bir xil server `event_id` yuborilib, deduplication sozlanishi kerak.

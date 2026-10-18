@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { branches } from "@/lib/data";
 import { getDictionary, localePath } from "@/lib/i18n";
-import LeadEvent from "./lead-event";
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
@@ -19,8 +18,6 @@ export default async function ApplicationThankYouPage({ params, searchParams }) 
 
   return (
     <main className="course-page">
-      <LeadEvent branch={branch} />
-
       <header className="site-header">
         <Link href={localePath(lang, "/")} className="site-brand">
           <img src="/logo.png" alt={t.logoAlt} className="site-logo" />

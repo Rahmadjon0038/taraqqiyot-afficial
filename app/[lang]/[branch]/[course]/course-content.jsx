@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { applicationTypes, branches } from "@/lib/data";
 import { getDictionary, localePath } from "@/lib/i18n";
+import { createMetaEventId, readAdSource, trackMetaEvent } from "@/lib/pixel";
 import LangSwitch from "../../../lang-switch";
 
 function formatPhone(digits) {
@@ -31,15 +32,6 @@ function GlobeIcon() {
   );
 }
 
-// Reklama manbasi (utm belgilari). Uni <AdSource /> sahifa ochilganda saqlab qo'yadi.
-function readAdSource() {
-  try {
-    return JSON.parse(sessionStorage.getItem("ad-source") ?? "{}");
-  } catch {
-    return {};
-  }
-}
-
 // course va branch berilmasa, bu umumiy ariza sahifasi: fan tanlanmaydi va yuborilmaydi.
 export default function CourseContent({ lang, branch = null, course = null, applicationType = null }) {
   const t = getDictionary(lang);
@@ -54,6 +46,7 @@ export default function CourseContent({ lang, branch = null, course = null, appl
   const [otherCity, setOtherCity] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
+  const submissionInProgress = useRef(false);
 
   function handlePhoneChange(event) {
     const digits = event.target.value.replace(/\D/g, "");
@@ -75,9 +68,11 @@ export default function CourseContent({ lang, branch = null, course = null, appl
   }
 
   async function submit() {
-    if (sending) return;
+    if (submissionInProgress.current) return;
+    submissionInProgress.current = true;
     setSending(true);
     setSendError("");
+    const eventID = createMetaEventId("lead");
 
     try {
       const response = await fetch("/api/lead", {
@@ -91,16 +86,31 @@ export default function CourseContent({ lang, branch = null, course = null, appl
           applicationType,
           otherCity,
           lang,
+          eventID,
           source: readAdSource(),
         }),
       });
 
       if (!response.ok) throw new Error("send failed");
     } catch {
+      submissionInProgress.current = false;
       setSending(false);
       setSendError(t.form.sendError);
       return;
     }
+
+    const trackedCourse = course ?? application?.course;
+    trackMetaEvent(
+      "Lead",
+      {
+        content_name: applicationType || course || "unknown",
+        branch: otherCity ? "other_city" : selectedBranch || "unknown",
+        language: lang,
+        content_category: "course_lead",
+        ...(trackedCourse ? { course: trackedCourse } : {}),
+      },
+      { eventID }
+    );
 
     if (course) {
       router.push(localePath(lang, `/${selectedBranch}/${course}/thank-you`));
