@@ -31,7 +31,7 @@ export function ApplicationPageView() {
 
     const params = new URLSearchParams(window.location.search);
     trackMetaEvent("ViewContent", {
-      content_name: params.get("application") || "ariza_page",
+      content_name: params.get("application") || params.get("course") || "ariza_page",
       branch: params.get("branch") || params.get("filial") || "all",
     });
   }, []);

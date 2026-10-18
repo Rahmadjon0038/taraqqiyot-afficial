@@ -204,7 +204,10 @@ export default async function Home({ params }) {
 
                   <div className="ticket-end">
                     <span className="ticket-barcode" aria-hidden="true" />
-                    <Link href={localePath(lang, `/${branches[0]}/${item.course}`)} className="btn-block">
+                    <Link
+                      href={localePath(lang, `/ariza?course=${encodeURIComponent(item.course)}`)}
+                      className="btn-block"
+                    >
                       {t.courses.apply}
                     </Link>
                   </div>

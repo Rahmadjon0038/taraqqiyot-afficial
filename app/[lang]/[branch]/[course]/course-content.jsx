@@ -64,7 +64,7 @@ export default function CourseContent({ lang, branch = null, course = null, appl
     setSelectedBranch(nextBranch);
     setOtherCity(false);
     setStep("form");
-    if (course) window.history.replaceState(null, "", localePath(lang, `/${nextBranch}/${course}`));
+    if (branch && course) window.history.replaceState(null, "", localePath(lang, `/${nextBranch}/${course}`));
   }
 
   async function submit() {
@@ -142,11 +142,13 @@ export default function CourseContent({ lang, branch = null, course = null, appl
         <LangSwitch
           lang={lang}
           path={
-            course
+            branch && course
               ? `/${selectedBranch}/${course}`
               : applicationType
                 ? `/ariza?application=${encodeURIComponent(applicationType)}`
-                : "/ariza"
+                : course
+                  ? `/ariza?course=${encodeURIComponent(course)}`
+                  : "/ariza"
           }
           className="lang-switch-page"
         />
