@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { branches } from "@/lib/data";
+import { applicationTypes, branches } from "@/lib/data";
 import { getDictionary, localePath } from "@/lib/i18n";
 import LangSwitch from "../../../lang-switch";
 
@@ -41,8 +41,9 @@ function readAdSource() {
 }
 
 // course va branch berilmasa, bu umumiy ariza sahifasi: fan tanlanmaydi va yuborilmaydi.
-export default function CourseContent({ lang, branch = null, course = null }) {
+export default function CourseContent({ lang, branch = null, course = null, applicationType = null }) {
   const t = getDictionary(lang);
+  const application = applicationType ? applicationTypes[applicationType] : null;
   const router = useRouter();
   const [step, setStep] = useState("location");
   const [selectedBranch, setSelectedBranch] = useState(branch);
@@ -86,7 +87,8 @@ export default function CourseContent({ lang, branch = null, course = null }) {
           name,
           phone: `998${phoneDigits}`,
           branch: otherCity ? null : selectedBranch,
-          course,
+          course: course ?? application?.course ?? null,
+          applicationType,
           otherCity,
           lang,
           source: readAdSource(),
@@ -129,7 +131,13 @@ export default function CourseContent({ lang, branch = null, course = null }) {
         </Link>
         <LangSwitch
           lang={lang}
-          path={course ? `/${selectedBranch}/${course}` : "/ariza"}
+          path={
+            course
+              ? `/${selectedBranch}/${course}`
+              : applicationType
+                ? `/ariza?application=${encodeURIComponent(applicationType)}`
+                : "/ariza"
+          }
           className="lang-switch-page"
         />
       </header>
@@ -149,6 +157,11 @@ export default function CourseContent({ lang, branch = null, course = null }) {
             </>
           )}
         </h1>
+        {application && (
+          <p className="application-context">
+            {t.form.applicationFor} <strong>{t.updates.applicationTypes[applicationType]}</strong>
+          </p>
+        )}
       </section>
 
       {step === "location" && (

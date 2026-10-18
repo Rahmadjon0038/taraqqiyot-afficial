@@ -4,6 +4,8 @@ import CertificateCarousel from "../certificate-carousel";
 import LazyFrame from "../lazy-frame";
 import Stamp from "../course-art";
 import LangSwitch from "../lang-switch";
+import AiPrompt from "../ai-prompt";
+import UpdatesCarousel from "../updates-carousel";
 import { branches, instagramVideos } from "@/lib/data";
 import { alternatesFor, getDictionary, localePath } from "@/lib/i18n";
 
@@ -108,6 +110,8 @@ export default async function Home({ params }) {
         </Link>
       </nav>
 
+      <UpdatesCarousel lang={lang} />
+
       <section className="home-hero" id="top">
         <p className="home-kicker">
           <b>Taraqqiyot Teaching Center</b> · {t.hero.kicker(branches.length)}
@@ -167,6 +171,8 @@ export default async function Home({ params }) {
           </div>
         </div>
       </section>
+
+      <AiPrompt lang={lang} />
 
       <div className="home-marquee" aria-hidden="true">
         <div className="home-marquee-track">

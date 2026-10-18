@@ -1,4 +1,4 @@
-import { branches, branchNames, courseNames, courses } from "@/lib/data";
+import { applicationTypes, branches, branchNames, courseNames, courses } from "@/lib/data";
 import { logEvent } from "@/lib/leads-log";
 import { chatIdFromEnv, keyboard, tashkentTime, tg } from "@/lib/telegram";
 
@@ -35,6 +35,10 @@ export async function POST(request) {
   const phone = String(body.phone ?? "").replace(/\D/g, "");
   const branch = branches.includes(body.branch) ? body.branch : null;
   const course = courses.includes(body.course) ? body.course : null;
+  const applicationType =
+    typeof body.applicationType === "string" && Object.hasOwn(applicationTypes, body.applicationType)
+      ? body.applicationType
+      : null;
   const otherCity = body.otherCity === true;
   const lang = { ru: "ru", en: "en" }[body.lang] ?? "uz";
   const source = cleanSource(body.source);
@@ -44,6 +48,7 @@ export async function POST(request) {
   }
 
   const lines = ["🆕 Yangi leads", "", `👤 Ism: ${name}`, `📞 Telefon: +${phone}`];
+  if (applicationType) lines.push(`🎯 Murojaat: ${applicationTypes[applicationType].name}`);
   if (course) lines.push(`📚 Kurs: ${courseNames[course]}`);
   if (otherCity) {
     lines.push("📍 Boshqa shahardan (borib o'qiy oladi)");
@@ -74,6 +79,7 @@ export async function POST(request) {
     phone,
     branch,
     course,
+    applicationType,
     otherCity,
     lang,
     source,

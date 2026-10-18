@@ -1,4 +1,5 @@
 import CourseContent from "../[branch]/[course]/course-content";
+import { applicationTypes } from "@/lib/data";
 import { alternatesFor, getDictionary } from "@/lib/i18n";
 
 export async function generateMetadata({ params }) {
@@ -12,7 +13,11 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function ApplicationPage({ params }) {
+export default async function ApplicationPage({ params, searchParams }) {
   const { lang } = await params;
-  return <CourseContent lang={lang} />;
+  const { application } = await searchParams;
+  const applicationType =
+    typeof application === "string" && Object.hasOwn(applicationTypes, application) ? application : null;
+
+  return <CourseContent lang={lang} applicationType={applicationType} />;
 }
