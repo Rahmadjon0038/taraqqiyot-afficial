@@ -43,7 +43,7 @@ body {
 	display: grid;
 	justify-items: center;
 	gap: 18px;
-	width: min(100% - 32px, 1280px);
+	width: min(100% - 32px, 1120px);
 	margin: 40px auto 0;
 	padding: clamp(24px, 4vw, 48px) clamp(18px, 4vw, 42px) 20px;
 	border: 1px solid rgb(27 16 14 / 18%);
@@ -667,7 +667,7 @@ body:has(.site-chat-page) .site-footer {
 	display: flex;
 	align-items: stretch;
 	justify-content: space-between;
-	width: min(100% - 32px, 1280px);
+	width: min(100% - 32px, 1120px);
 	height: 56px;
 	border: var(--line);
 	background: var(--card);
@@ -789,7 +789,7 @@ body:has(.site-chat-page) .site-footer {
 /* Home: announcements carousel */
 
 .home-updates {
-	width: min(100% - 32px, 1280px);
+	width: min(100% - 32px, 1120px);
 	margin: 0 auto;
 	padding: 94px 0 0;
 }
@@ -1024,7 +1024,7 @@ body:has(.site-chat-page) .site-footer {
 	display: grid;
 	grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
 	column-gap: 30px;
-	width: min(100% - 32px, 1280px);
+	width: min(100% - 32px, 1120px);
 	margin: 0 auto;
 	padding: 48px clamp(20px, 4vw, 56px) 70px;
 }
