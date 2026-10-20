@@ -4,7 +4,6 @@ import CertificateCarousel from "../certificate-carousel";
 import LazyFrame from "../lazy-frame";
 import Stamp from "../course-art";
 import LangSwitch from "../lang-switch";
-import AiPrompt from "../ai-prompt";
 import UpdatesCarousel from "../updates-carousel";
 import { branches, instagramVideos } from "@/lib/data";
 import { alternatesFor, getDictionary, localePath } from "@/lib/i18n";
@@ -172,7 +171,7 @@ export default async function Home({ params }) {
         </div>
       </section>
 
-      <AiPrompt lang={lang} />
+      {/* AI savol bloki vaqtincha yashirilgan (Gemini kaliti sozlanmaguncha): <AiPrompt lang={lang} /> */}
 
       <div className="home-marquee" aria-hidden="true">
         <div className="home-marquee-track">
