@@ -14,6 +14,8 @@ export default function UpdatesCarousel({ lang }) {
   const pointerStartX = useRef(null);
   const suppressClick = useRef(false);
   const [slides, setSlides] = useState([]);
+  // Ro'yxat kelguncha bo'sh joy o'rniga skeleton ko'rsatiladi: pastdagi matnlar yuqoriga sakramaydi.
+  const [loaded, setLoaded] = useState(false);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [failedImages, setFailedImages] = useState({});
@@ -41,6 +43,8 @@ export default function UpdatesCarousel({ lang }) {
         }
       } catch (error) {
         if (!ignore) console.error("Could not load announcements:", error);
+      } finally {
+        if (!ignore) setLoaded(true);
       }
     }
 
@@ -141,6 +145,18 @@ export default function UpdatesCarousel({ lang }) {
 
     return () => window.clearTimeout(timer);
   }, [activeKey, availableSlides, paused]);
+
+  if (!loaded) {
+    return (
+      <section className="home-updates" aria-label={t.sectionLabel} aria-busy="true">
+        <div className="home-updates-banner home-updates-skeleton" data-mobile-layout="true" aria-hidden="true" />
+        <div className="home-updates-toolbar home-updates-skeleton-toolbar" aria-hidden="true">
+          <span className="home-updates-skeleton-line" />
+          <span className="home-updates-skeleton-button" />
+        </div>
+      </section>
+    );
+  }
 
   if (!activeSlide) return null;
 

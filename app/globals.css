@@ -2838,6 +2838,60 @@ body:has(.site-chat-page) .site-footer {
 	}
 }
 
+/* Karusel yuklanguncha: asl banner va panel o'lchamida skeleton */
+.home-updates-skeleton {
+	cursor: default;
+	background: linear-gradient(100deg, #efe9e6 30%, #f8f4f2 50%, #efe9e6 70%) 0 0 / 200% 100%;
+	animation: home-updates-shimmer 1.4s linear infinite;
+}
+
+.home-updates-skeleton-toolbar {
+	justify-content: space-between;
+}
+
+.home-updates-skeleton-line,
+.home-updates-skeleton-button {
+	display: block;
+	border-radius: 10px;
+	background: linear-gradient(100deg, #efe9e6 30%, #f8f4f2 50%, #efe9e6 70%) 0 0 / 200% 100%;
+	animation: home-updates-shimmer 1.4s linear infinite;
+}
+
+.home-updates-skeleton-line {
+	width: 150px;
+	height: 22px;
+}
+
+.home-updates-skeleton-button {
+	width: 300px;
+	height: 56px;
+}
+
+@keyframes home-updates-shimmer {
+	to {
+		background-position: -200% 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.home-updates-skeleton,
+	.home-updates-skeleton-line,
+	.home-updates-skeleton-button {
+		animation: none;
+	}
+}
+
+@media (max-width: 560px) {
+	.home-updates-skeleton-toolbar {
+		min-height: 125px;
+	}
+
+	.home-updates-skeleton-line,
+	.home-updates-skeleton-button {
+		width: 100%;
+	}
+}
+
 /* Legal pages */
 
 .legal {
