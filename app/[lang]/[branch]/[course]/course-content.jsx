@@ -60,6 +60,7 @@ export default function CourseContent({ lang, branch = null, course = null, appl
 
     setPhoneDigits(withoutPrefix.slice(0, 9));
     setPhoneError("");
+    setSendError("");
   }
 
   function chooseBranch(nextBranch) {
@@ -67,6 +68,12 @@ export default function CourseContent({ lang, branch = null, course = null, appl
     setOtherCity(false);
     setStep("form");
     if (branch && course) window.history.replaceState(null, "", localePath(lang, `/${nextBranch}/${course}`));
+  }
+
+  // Oyna yopilganda eski xato ("oldin yuborgansiz") qolib, yangi raqamda chalg'itmasin.
+  function closeConfirmation() {
+    setShowConfirmation(false);
+    setSendError("");
   }
 
   async function submit() {
@@ -137,7 +144,7 @@ export default function CourseContent({ lang, branch = null, course = null, appl
     if (!showConfirmation) return;
 
     function handleKeyDown(event) {
-      if (event.key === "Escape") setShowConfirmation(false);
+      if (event.key === "Escape") closeConfirmation();
     }
 
     document.addEventListener("keydown", handleKeyDown);
@@ -262,6 +269,7 @@ export default function CourseContent({ lang, branch = null, course = null, appl
               event.preventDefault();
               if (phoneDigits.length === 9) {
                 setPhoneError("");
+                setSendError("");
                 setShowConfirmation(true);
               } else {
                 setPhoneError(t.form.phoneError);
@@ -299,7 +307,7 @@ export default function CourseContent({ lang, branch = null, course = null, appl
           </form>
 
           {showConfirmation && (
-            <div className="modal-backdrop" onClick={() => setShowConfirmation(false)}>
+            <div className="modal-backdrop" onClick={closeConfirmation}>
               <div
                 className="phone-confirmation"
                 role="dialog"
@@ -309,7 +317,7 @@ export default function CourseContent({ lang, branch = null, course = null, appl
                 <p>{t.form.confirm}</p>
                 <strong>+998 {formatPhone(phoneDigits)}</strong>
                 <div className="confirmation-actions">
-                  <button type="button" onClick={() => setShowConfirmation(false)} disabled={sending}>
+                  <button type="button" onClick={closeConfirmation} disabled={sending}>
                     {t.form.no}
                   </button>
                   <button type="button" onClick={submit} disabled={sending}>
