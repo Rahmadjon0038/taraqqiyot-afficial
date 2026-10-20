@@ -1658,13 +1658,13 @@ body:has(.site-chat-page) .site-footer {
 }
 
 /* The frame shows only the media area of the Instagram embed: its 54px header is
-   pushed above the frame and everything below a 4:5 box is clipped. */
+   pushed above the frame and everything below a 1:1 box is clipped. */
 .home-video-frame {
 	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	aspect-ratio: 4 / 5;
+	aspect-ratio: 1 / 1;
 	overflow: hidden;
 	background: repeating-linear-gradient(-45deg, #f4f4f2 0 14px, #ececea 14px 28px);
 	color: #8a8a84;
@@ -2754,7 +2754,7 @@ body:has(.site-chat-page) .site-footer {
 
 	.home-updates {
 		/* Telefonda banner chetlardan 20px ichkarida (avval 12px edi). */
-		width: calc(100% - 40px);
+		width: calc(100% - 64px);
 		padding-top: 82px;
 	}
 
@@ -2769,10 +2769,10 @@ body:has(.site-chat-page) .site-footer {
 		box-shadow: 0 12px 28px rgb(27 16 14 / 14%), 0 3px 0 var(--red);
 	}
 
-	/* Karuselda telefon banneri bo'lsa, telefonda ramka baland (4:5) bo'ladi. Telefon rasmi
+	/* Karuselda telefon banneri bo'lsa, telefonda ramka baland (kvadrat 1:1) bo'ladi. Telefon rasmi
 	   yo'q e'lonlarning keng rasmi kesilmasdan, o'rtada ko'rsatiladi. */
 	.home-updates-banner[data-mobile-layout="true"] {
-		aspect-ratio: 4 / 5;
+		aspect-ratio: 1 / 1;
 	}
 
 	.home-updates-banner[data-mobile-layout="true"]:not([data-mobile-image="true"]) > picture > img {
