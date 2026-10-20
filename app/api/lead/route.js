@@ -58,7 +58,7 @@ async function createLead(request) {
     return Response.json({ ok: false, error: "invalid" }, { status: 400 });
   }
 
-  if (await hasMatchingLead({ phone, branch, course, applicationType, otherCity })) {
+  if (await hasMatchingLead({ phone, branch, course, applicationType, vacancyTitle, otherCity })) {
     return Response.json({ ok: false, error: "duplicate" }, { status: 409 });
   }
 

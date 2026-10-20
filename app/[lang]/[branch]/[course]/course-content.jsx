@@ -36,8 +36,8 @@ function GlobeIcon() {
 export default function CourseContent({ lang, branch = null, course = null, applicationType = null, vacancyTitle = "" }) {
   const t = getDictionary(lang);
   const application = applicationType ? applicationTypes[applicationType] : null;
-  const resolvedVacancyTitle =
-    applicationType === "teacher-vacancy" && vacancyTitle ? vacancyTitle : applicationType === "teacher-vacancy" ? applicationTypes[applicationType].name : "";
+  const isVacancy = applicationType === "teacher-vacancy" || applicationType === "vacancy";
+  const resolvedVacancyTitle = isVacancy ? vacancyTitle || applicationTypes[applicationType].name : "";
   const router = useRouter();
   const [step, setStep] = useState("location");
   const [selectedBranch, setSelectedBranch] = useState(branch);
