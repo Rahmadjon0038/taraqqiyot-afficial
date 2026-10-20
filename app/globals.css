@@ -811,7 +811,13 @@ body:has(.site-chat-page) .site-footer {
 	cursor: grabbing;
 }
 
-.home-updates-banner > img {
+.home-updates-banner > picture {
+	position: absolute;
+	inset: 0;
+	display: block;
+}
+
+.home-updates-banner > picture > img {
 	display: block;
 	width: 100%;
 	height: 100%;
@@ -830,11 +836,11 @@ body:has(.site-chat-page) .site-footer {
 	outline-offset: -6px;
 }
 
-.home-updates-banner.is-next > img {
+.home-updates-banner.is-next > picture > img {
 	animation: home-updates-slide-in-next 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.home-updates-banner.is-previous > img {
+.home-updates-banner.is-previous > picture > img {
 	animation: home-updates-slide-in-previous 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -2747,7 +2753,8 @@ body:has(.site-chat-page) .site-footer {
 	}
 
 	.home-updates {
-		width: calc(100% - 24px);
+		/* Telefonda banner chetlardan 20px ichkarida (avval 12px edi). */
+		width: calc(100% - 40px);
 		padding-top: 82px;
 	}
 
@@ -2760,6 +2767,17 @@ body:has(.site-chat-page) .site-footer {
 	.home-updates-banner {
 		border-radius: 12px;
 		box-shadow: 0 12px 28px rgb(27 16 14 / 14%), 0 3px 0 var(--red);
+	}
+
+	/* Karuselda telefon banneri bo'lsa, telefonda ramka baland (4:5) bo'ladi. Telefon rasmi
+	   yo'q e'lonlarning keng rasmi kesilmasdan, o'rtada ko'rsatiladi. */
+	.home-updates-banner[data-mobile-layout="true"] {
+		aspect-ratio: 4 / 5;
+	}
+
+	.home-updates-banner[data-mobile-layout="true"]:not([data-mobile-image="true"]) > picture > img {
+		object-fit: contain;
+		background: var(--ink);
 	}
 
 	.home-updates-toolbar {
@@ -2815,7 +2833,7 @@ body:has(.site-chat-page) .site-footer {
 	.home-badge svg,
 	.home-marquee-track,
 	.home-updates-apply,
-	.home-updates-banner > img {
+	.home-updates-banner > picture > img {
 		animation: none;
 	}
 }

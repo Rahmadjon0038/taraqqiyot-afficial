@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { getDictionary, localePath } from "@/lib/i18n";
 
 const slideDuration = 3000;
+// Shu kenglikdan tor ekranlarda (telefon) telefon banneri ko'rsatiladi. CSS dagi 560px bilan bir xil bo'lishi kerak.
+const MOBILE_MEDIA = "(max-width: 560px)";
 const swipeThreshold = 48;
 
 export default function UpdatesCarousel({ lang }) {
@@ -16,6 +17,8 @@ export default function UpdatesCarousel({ lang }) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [failedImages, setFailedImages] = useState({});
+  // Telefon rasmi yuklanmasa (masalan, o'chirilgan bo'lsa), shu e'lon uchun kompyuter rasmiga qaytamiz.
+  const [failedMobile, setFailedMobile] = useState({});
   const [paused, setPaused] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
 
@@ -55,6 +58,10 @@ export default function UpdatesCarousel({ lang }) {
   const activeSlide = availableSlides.find((_, slideIndex) => slideIndex === index) ?? availableSlides[0];
   const activeIndex = availableSlides.findIndex((slide) => slide.id === activeSlide?.id);
   const activeKey = activeSlide?.id ?? "default";
+  const hasMobileImage = Boolean(activeSlide?.mobileImage) && !failedMobile[activeSlide?.id];
+  // Kamida bitta e'londa telefon banneri bo'lsa, telefonda hamma ramka bir xil balandlikda bo'ladi:
+  // aks holda karusel aylanganda sahifa sakrab turadi.
+  const anyMobileImage = slides.some((slide) => slide.mobileImage && !failedMobile[slide.id]);
   const activeHref =
     activeSlide?.type === "course" && activeSlide?.course
       ? localePath(
@@ -141,6 +148,8 @@ export default function UpdatesCarousel({ lang }) {
     <section className="home-updates" aria-label={t.sectionLabel}>
       <div
         className={`home-updates-banner ${direction > 0 ? "is-next" : "is-previous"}`}
+        data-mobile-layout={anyMobileImage ? "true" : undefined}
+        data-mobile-image={hasMobileImage ? "true" : undefined}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -155,17 +164,23 @@ export default function UpdatesCarousel({ lang }) {
           if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
         }}
       >
-        <Image
-          key={activeSlide.id || activeSlide.image}
-          src={activeSlide.image}
-          alt={activeSlide.title || t.bannerAlt(activeIndex + 1)}
-          fill
-          priority
-          unoptimized
-          draggable={false}
-          sizes="(max-width: 560px) calc(100vw - 24px), (max-width: 1472px) calc(100vw - 32px), 1440px"
-          onError={() => setFailedImages((current) => ({ ...current, [activeIndex]: true }))}
-        />
+        <picture key={activeSlide.id || activeSlide.image}>
+          {hasMobileImage && <source media={MOBILE_MEDIA} srcSet={activeSlide.mobileImage} />}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={activeSlide.image}
+            alt={activeSlide.title || t.bannerAlt(activeIndex + 1)}
+            fetchPriority="high"
+            draggable={false}
+            onError={() => {
+              if (hasMobileImage && window.matchMedia(MOBILE_MEDIA).matches) {
+                setFailedMobile((current) => ({ ...current, [activeSlide.id]: true }));
+              } else {
+                setFailedImages((current) => ({ ...current, [activeIndex]: true }));
+              }
+            }}
+          />
+        </picture>
 
         {activeSlide?.type === "news" ? (
           <button
@@ -238,7 +253,11 @@ export default function UpdatesCarousel({ lang }) {
             <button type="button" onClick={() => setActiveModal(null)} aria-label="Close image" style={{ position: "absolute", zIndex: 1, top: 16, right: 16, width: 44, height: 44, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.5)", background: "rgba(0,0,0,0.55)", color: "#fff", fontSize: 26, cursor: "pointer" }}>
               ×
             </button>
-            <Image src={activeModal.image} alt={activeModal.title} fill unoptimized style={{ objectFit: "contain" }} sizes="100vw" />
+            <picture>
+              {activeModal.mobileImage && <source media={MOBILE_MEDIA} srcSet={activeModal.mobileImage} />}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={activeModal.image} alt={activeModal.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
+            </picture>
           </div>
         </div>
       )}
