@@ -2769,10 +2769,10 @@ body:has(.site-chat-page) .site-footer {
 		box-shadow: 0 12px 28px rgb(27 16 14 / 14%), 0 3px 0 var(--red);
 	}
 
-	/* Karuselda telefon banneri bo'lsa, telefonda ramka baland (kvadrat 1:1) bo'ladi. Telefon rasmi
+	/* Karuselda telefon banneri bo'lsa, telefonda ramka baland (4:3) bo'ladi. Telefon rasmi
 	   yo'q e'lonlarning keng rasmi kesilmasdan, o'rtada ko'rsatiladi. */
 	.home-updates-banner[data-mobile-layout="true"] {
-		aspect-ratio: 1 / 1;
+		aspect-ratio: 4 / 3;
 	}
 
 	.home-updates-banner[data-mobile-layout="true"]:not([data-mobile-image="true"]) > picture > img {
