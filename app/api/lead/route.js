@@ -72,9 +72,6 @@ async function createLead(request) {
     lines.push(`📍 Filial: ${branchNames[branch]}`);
   }
   if (lang !== "uz") lines.push(`🌐 Sayt tili: ${lang === "ru" ? "Ruscha" : "Inglizcha"}`);
-  if (Object.keys(source).length) {
-    lines.push(`📣 Reklama: ${Object.entries(source).map(([key, value]) => `${key}=${value}`).join(" · ")}`);
-  }
   lines.push(`🕒 ${tashkentTime(new Date(), true)}`);
 
   const sent = await tg("sendMessage", {
