@@ -33,13 +33,21 @@ function GlobeIcon() {
 }
 
 // course va branch berilmasa, bu umumiy ariza sahifasi: fan tanlanmaydi va yuborilmaydi.
-export default function CourseContent({ lang, branch = null, course = null, applicationType = null, vacancyTitle = "" }) {
+export default function CourseContent({ lang, branch = null, course = null, applicationType = null, vacancyTitle = "", branchLocked = false }) {
   const t = getDictionary(lang);
   const application = applicationType ? applicationTypes[applicationType] : null;
   const isVacancy = applicationType === "teacher-vacancy" || applicationType === "vacancy";
   const resolvedVacancyTitle = isVacancy ? vacancyTitle || applicationTypes[applicationType].name : "";
   const router = useRouter();
-  const [step, setStep] = useState("location");
+  // Til almashtirilganda ariza parametrlari (kurs, vakansiya, filial) yo'qolmasligi uchun.
+  const applicationQuery = new URLSearchParams({
+    ...(applicationType ? { application: applicationType } : {}),
+    ...(course ? { course } : {}),
+    ...(isVacancy && vacancyTitle ? { vacancy_title: vacancyTitle } : {}),
+    ...(branch ? { branch } : {}),
+  }).toString();
+  // Filial e'lon havolasida oldindan belgilangan bo'lsa (DM platformadan), joy so'ralmaydi: to'g'ridan-to'g'ri forma.
+  const [step, setStep] = useState(branchLocked && branch ? "form" : "location");
   const [selectedBranch, setSelectedBranch] = useState(branch);
   const [phoneDigits, setPhoneDigits] = useState("");
   const [phoneError, setPhoneError] = useState("");
@@ -161,13 +169,11 @@ export default function CourseContent({ lang, branch = null, course = null, appl
         <LangSwitch
           lang={lang}
           path={
-            branch && course
+            branch && course && !branchLocked
               ? `/${selectedBranch}/${course}`
-              : applicationType
-                ? `/ariza?application=${encodeURIComponent(applicationType)}`
-                : course
-                  ? `/ariza?course=${encodeURIComponent(course)}`
-                  : "/ariza"
+              : applicationQuery
+                ? `/ariza?${applicationQuery}`
+                : "/ariza"
           }
           className="lang-switch-page"
         />

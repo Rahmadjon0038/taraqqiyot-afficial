@@ -33,6 +33,7 @@ export default async function ApplicationPage({ params, searchParams }) {
         branch={branch}
         applicationType={applicationType}
         course={course}
+        branchLocked={Boolean(branch)}
         vacancyTitle={vacancyTitle || (applicationType === "teacher-vacancy" || applicationType === "vacancy" ? applicationTypes[applicationType].name : "")}
       />
     </>
