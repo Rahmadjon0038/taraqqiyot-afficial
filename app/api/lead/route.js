@@ -1,6 +1,7 @@
-import { applicationTypes, branches, branchNames, courseNames, courses } from "@/lib/data";
+import { applicationTypes, branches, courses } from "@/lib/data";
+import { buildLeadText } from "@/lib/lead-message";
 import { hasMatchingLead, logEvent, serializeLeadSubmissions } from "@/lib/leads-log";
-import { chatIdFromEnv, keyboard, tashkentTime, tg } from "@/lib/telegram";
+import { chatIdFromEnv, keyboard, tg } from "@/lib/telegram";
 
 const SOURCE_KEYS = [
   "utm_source",
@@ -62,21 +63,11 @@ async function createLead(request) {
     return Response.json({ ok: false, error: "duplicate" }, { status: 409 });
   }
 
-  const lines = ["🆕 Yangi leads", "", `👤 Ism: ${name}`, `📞 Telefon: +${phone}`];
-  if (applicationType) lines.push(`🎯 Murojaat: ${applicationTypes[applicationType].name}`);
-  if (vacancyTitle) lines.push(`📌 Lavozim: ${vacancyTitle}`);
-  if (course) lines.push(`📚 Kurs: ${courseNames[course]}`);
-  if (otherCity) {
-    lines.push("📍 Boshqa shahardan (borib o'qiy oladi)");
-  } else if (branch) {
-    lines.push(`📍 Filial: ${branchNames[branch]}`);
-  }
-  if (lang !== "uz") lines.push(`🌐 Sayt tili: ${lang === "ru" ? "Ruscha" : "Inglizcha"}`);
-  lines.push(`🕒 ${tashkentTime(new Date(), true)}`);
+  const text = buildLeadText({ name, phone, course, applicationType, vacancyTitle, branch, otherCity, lang });
 
   const sent = await tg("sendMessage", {
     chat_id: chatIdFromEnv(),
-    text: lines.join("\n"),
+    text,
     reply_markup: keyboard(),
   });
 

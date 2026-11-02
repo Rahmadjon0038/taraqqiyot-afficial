@@ -5,6 +5,7 @@
 #   ./deploy.sh stop     — to'xtatadi
 #   ./deploy.sh restart  — qayta yig'masdan qayta ishga tushiradi
 #   ./deploy.sh status   — holatini ko'rsatadi
+#   ./deploy.sh crm-key  — CRM uchun API kalitni ko'rsatadi
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -21,8 +22,9 @@ case "${1:-deploy}" in
   stop)    exec docker compose down ;;
   restart) exec docker compose restart ;;
   status)  exec docker compose ps ;;
+  crm-key) grep -E "^CRM_API_KEY=" .env || fail ".env ichida CRM_API_KEY yo'q: avval ./deploy.sh ni ishga tushiring."; exit 0 ;;
   deploy)  ;;
-  *)       fail "Noma'lum buyruq: $1 (deploy | logs | stop | restart | status)" ;;
+  *)       fail "Noma'lum buyruq: $1 (deploy | logs | stop | restart | status | crm-key)" ;;
 esac
 
 # 1. Sozlamalar fayli
@@ -35,6 +37,17 @@ if [ ! -f .env ]; then
   exit 1
 fi
 chmod 600 .env
+
+# CRM integratsiyasi uchun API kalit: yo'q bo'lsa, server o'zi yaratadi (bir marta) va ko'rsatadi.
+if ! grep -qE "^CRM_API_KEY=.+" .env; then
+  crm_key="$(openssl rand -hex 32 2>/dev/null || head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')"
+  grep -v "^CRM_API_KEY=" .env > .env.tmp || true
+  printf 'CRM_API_KEY=%s\n' "$crm_key" >> .env.tmp
+  mv .env.tmp .env
+  chmod 600 .env
+  echo "==> CRM_API_KEY yaratildi va .env ga yozildi. CRM dasturchisiga bering (keyin ko'rish: ./deploy.sh crm-key):"
+  echo "    CRM_API_KEY=${crm_key}"
+fi
 
 read_env() { grep -E "^$1=" .env | tail -n 1 | cut -d= -f2- | tr -d '"'"'"' \r' || true; }
 

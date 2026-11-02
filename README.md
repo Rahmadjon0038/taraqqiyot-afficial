@@ -29,6 +29,7 @@ cd taraqqiyot-afficial
 | `./deploy.sh status` | holat |
 | `./deploy.sh restart` | qayta ishga tushirish |
 | `./deploy.sh stop` | to'xtatish |
+| `./deploy.sh crm-key` | CRM uchun API kalitni ko'rsatadi (qo'llanma: [docs/CRM-API.md](docs/CRM-API.md)) |
 
 Token faqat serverdagi `.env` faylida turadi: git'ga ham, Docker image'ga ham, brauzerga ham chiqmaydi.
 
