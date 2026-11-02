@@ -1,4 +1,5 @@
 import { applicationTypes, branches, courses } from "@/lib/data";
+import { sendLeadToCrm } from "@/lib/crm";
 import { buildLeadText } from "@/lib/lead-message";
 import { hasMatchingLead, logEvent, serializeLeadSubmissions } from "@/lib/leads-log";
 import { chatIdFromEnv, keyboard, tg } from "@/lib/telegram";
@@ -76,9 +77,10 @@ async function createLead(request) {
     return Response.json({ ok: false, error: "telegram" }, { status: 502 });
   }
 
+  const leadId = `${sent.result.chat.id}:${sent.result.message_id}`;
   await logEvent({
     type: "lead",
-    id: `${sent.result.chat.id}:${sent.result.message_id}`,
+    id: leadId,
     name,
     phone,
     branch,
@@ -89,6 +91,9 @@ async function createLead(request) {
     lang,
     source,
   });
+
+  // Markaz CRM'iga shu zahoti yuboriladi (sozlangan bo'lsa); javobni kutmaymiz.
+  sendLeadToCrm({ id: leadId, name, phone, course, vacancyTitle, applicationType, branch, otherCity, lang, source });
 
   return Response.json({ ok: true });
 }

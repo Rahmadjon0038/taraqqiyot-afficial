@@ -1,5 +1,10 @@
 # CRM integratsiyasi: Taraqqiyot sayti API qo'llanmasi
 
+> **Joriy ulanish (markaz CRM'i):** ariza tushishi bilan sayt uni CRM'ning `POST /api/leads/intake` manziliga o'zi yuboradi
+> (`x-leads-token` bilan). Sozlash: saytning `.env` ida `CRM_INTAKE_URL` va `CRM_INTAKE_TOKEN` (CRM'dagi `LEADS_INTAKE_TOKEN`
+> bilan bir xil). CRM xato qaytarsa, sayt 3 marta qayta uriladi; ariza baribir Telegramga tushadi va saytning jurnalida saqlanadi.
+> Quyidagi `GET`/`POST` API'lar tashqi tizimlar uchun va zaxira sifatida qoladi.
+
 Saytdagi forma orqali tushgan arizalarni (lidlarni) CRM'ga olish va CRM'da operator belgilagan holatni ("keldi", "kelmaydi"...) saytga qaytarish uchun API.
 
 - **Asosiy manzil:** `https://taraqqiyot-official.uz`
