@@ -75,7 +75,14 @@ export default function CourseContent({ lang, branch = null, course = null, appl
     setSelectedBranch(nextBranch);
     setOtherCity(false);
     setStep("form");
-    if (branch && course) window.history.replaceState(null, "", localePath(lang, `/${nextBranch}/${course}`));
+    if (branch && course) {
+      window.history.replaceState(null, "", localePath(lang, `/${nextBranch}/${course}`));
+    } else if (!branch && course && !applicationType) {
+      // Umumiy ariza havolasi: filial tanlangach manzil shu filialga moslanadi (reklamaga shu havolani qo'yish mumkin)
+      const query = new URLSearchParams(window.location.search);
+      query.set("branch", nextBranch);
+      window.history.replaceState(null, "", `${localePath(lang, "/ariza")}?${query}`);
+    }
   }
 
   // Oyna yopilganda eski xato ("oldin yuborgansiz") qolib, yangi raqamda chalg'itmasin.
