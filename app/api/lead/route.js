@@ -2,6 +2,7 @@ import { applicationTypes, branches, courses } from "@/lib/data";
 import { sendLeadToCrm } from "@/lib/crm";
 import { buildLeadText } from "@/lib/lead-message";
 import { hasMatchingLead, logEvent, serializeLeadSubmissions } from "@/lib/leads-log";
+import { getForcedBranch } from "@/lib/lead-routing";
 import { chatIdForBranch, chatIdFromEnv, keyboard, tg } from "@/lib/telegram";
 
 const SOURCE_KEYS = [
@@ -45,14 +46,16 @@ async function createLead(request) {
 
   const name = String(body.name ?? "").trim().slice(0, 80);
   const phone = String(body.phone ?? "").replace(/\D/g, "");
-  const branch = branches.includes(body.branch) ? body.branch : null;
+  const otherCity = body.otherCity === true;
+  const chosenBranch = branches.includes(body.branch) ? body.branch : null;
+  // DM'da filial majburiy tanlangan bo'lsa, mijoz tanlovidan qat'i nazar o'sha filialga ketadi
+  const branch = otherCity ? chosenBranch : ((await getForcedBranch(branches)) ?? chosenBranch);
   const course = courses.includes(body.course) ? body.course : null;
   const applicationType =
     typeof body.applicationType === "string" && Object.hasOwn(applicationTypes, body.applicationType)
       ? body.applicationType
       : null;
   const vacancyTitle = typeof body.vacancyTitle === "string" ? body.vacancyTitle.trim().slice(0, 200) : "";
-  const otherCity = body.otherCity === true;
   const lang = { ru: "ru", en: "en" }[body.lang] ?? "uz";
   const source = cleanSource(body.source);
 
