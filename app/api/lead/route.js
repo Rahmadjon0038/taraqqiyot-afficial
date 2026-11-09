@@ -2,7 +2,7 @@ import { applicationTypes, branches, courses } from "@/lib/data";
 import { sendLeadToCrm } from "@/lib/crm";
 import { buildLeadText } from "@/lib/lead-message";
 import { hasMatchingLead, logEvent, serializeLeadSubmissions } from "@/lib/leads-log";
-import { chatIdFromEnv, keyboard, tg } from "@/lib/telegram";
+import { chatIdForBranch, chatIdFromEnv, keyboard, tg } from "@/lib/telegram";
 
 const SOURCE_KEYS = [
   "utm_source",
@@ -67,7 +67,7 @@ async function createLead(request) {
   const text = buildLeadText({ name, phone, course, applicationType, vacancyTitle, branch, otherCity, lang });
 
   const sent = await tg("sendMessage", {
-    chat_id: chatIdFromEnv(),
+    chat_id: otherCity ? chatIdFromEnv() : chatIdForBranch(branch),
     text,
     reply_markup: keyboard(),
   });
